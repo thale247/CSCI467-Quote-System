@@ -1,11 +1,8 @@
 <?php
-$host = "localhost";
-$user = "root";
-$password = "";
-$database = "my_web_app";
+$connection_string = getenv('AZURE_MYSQL_CONNECTIONSTRING');
 
 // Create connection
-$conn = new mysqli($host, $user, $password, $database);
+$conn = new mysqli($connection_string);
 
 // Check connection
 if ($conn->connect_error) {
