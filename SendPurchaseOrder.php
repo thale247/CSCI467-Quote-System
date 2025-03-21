@@ -3,8 +3,8 @@ $url = 'http://blitz.cs.niu.edu/PurchaseOrder/';
 $data = array(
 	'order' => 'xyz-987654321-ba', 
 	'associate' => 'RE-676732',
-	'custid' => '21', 
-	'amount' => '7654.32');
+	'custid' => $_POST['user'], 
+	'amount' => $_POST['price']);
 		
 $options = array(
     'http' => array(

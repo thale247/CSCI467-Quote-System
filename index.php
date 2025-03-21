@@ -18,7 +18,11 @@ session_start();
 
     <?php include 'includes/header.php'; ?> <!-- Navigation Bar -->
 
-    <form action="SendPurchaseOrder.php" method="get">
+    <form action="SendPurchaseOrder.php" method="POST">
+      <label for="user">User:</label>
+      <input type="text" id="user" name="user"><br><br>
+      <label for="lname">Price:</label>
+      <input type="text" id="price" name="price"><br><br>
       <input type="submit" value="Run me now!">
     </form>
 
