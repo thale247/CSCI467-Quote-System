@@ -18,7 +18,7 @@ session_start();
 
     <?php include 'includes/header.php'; ?> <!-- Navigation Bar -->
 
-    <form action="script.php" method="get">
+    <form action="SendPurchaseOrder.php" method="get">
       <input type="submit" value="Run me now!">
     </form>
 
