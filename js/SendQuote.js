@@ -1,7 +1,7 @@
 function sendData() {
     let formData = new FormData(document.getElementById("send_quote_form"));
 
-    fetch("SendPurchaseOrder.php", {
+    fetch("../php/SendPurchaseOrder.php", {
         method: "POST",
         body: formData
     })

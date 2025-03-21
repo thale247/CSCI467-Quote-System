@@ -26,7 +26,7 @@ session_start();
       <button type="button" onclick="sendData()">Submit</button>
     </form>
     <div id="response"></div>
-    <script src="SendQuote.js"></script>
+    <script src="js/SendQuote.js"></script>
     <?php include 'includes/footer.php'; ?> <!-- Footer -->
 
 </body>
