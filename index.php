@@ -25,7 +25,7 @@ session_start();
       <input type="text" id="price" name="price"><br><br>
       <input type="submit" value="Run me now!">
     </form>
-
+    <div id="response"></div>
     <script src="SendQuote.js"></script>
     <?php include 'includes/footer.php'; ?> <!-- Footer -->
 
