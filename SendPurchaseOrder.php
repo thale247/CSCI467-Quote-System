@@ -1,7 +1,12 @@
 <?php
+function generateOrderID() {
+    $uniquePart = uniqid();
+    return "3-$uniquePart-B";
+}
+
 $url = 'http://blitz.cs.niu.edu/PurchaseOrder/';
 $data = array(
-	'order' => 'xyz-987654323-ba', 
+	'order' => generateOrderID(), 
 	'associate' => 'RE-676732',
 	'custid' => $_POST['user'], 
 	'amount' => $_POST['price']);
