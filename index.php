@@ -18,7 +18,7 @@ session_start();
 
     <?php include 'includes/header.php'; ?> <!-- Navigation Bar -->
 
-    <form action="SendPurchaseOrder.php" method="POST">
+    <form id="send_quote_form"> <!-- action="SendPurchaseOrder.php" method="POST" -->
       <label for="user">User:</label>
       <input type="text" id="user" name="user"><br><br>
       <label for="lname">Price:</label>
@@ -26,6 +26,7 @@ session_start();
       <input type="submit" value="Run me now!">
     </form>
 
+    <script src="SendQuote.js"></script>
     <?php include 'includes/footer.php'; ?> <!-- Footer -->
 
 </body>

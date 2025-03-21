@@ -1,7 +1,7 @@
 <?php
 $url = 'http://blitz.cs.niu.edu/PurchaseOrder/';
 $data = array(
-	'order' => 'xyz-987654321-ba', 
+	'order' => 'xyz-987654323-ba', 
 	'associate' => 'RE-676732',
 	'custid' => $_POST['user'], 
 	'amount' => $_POST['price']);
