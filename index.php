@@ -23,7 +23,7 @@ session_start();
       <input type="text" id="user" name="user"><br><br>
       <label for="lname">Price:</label>
       <input type="text" id="price" name="price"><br><br>
-      <input type="submit" value="Run me now!">
+      <button type="button" onclick="sendData()">Submit</button>
     </form>
     <div id="response"></div>
     <script src="SendQuote.js"></script>
