@@ -16,7 +16,7 @@ session_start();
 </head>
 <body>
 
-    <?php include '/includes/header.php'; ?> <!-- Navigation Bar -->
+    <?php include 'includes/header.php'; ?> <!-- Navigation Bar -->
 
     <form id="send_quote_form"> <!-- action="SendPurchaseOrder.php" method="POST" -->
       <label for="user">User:</label>
@@ -31,7 +31,7 @@ session_start();
     <div id="response"></div>
     <script src="/js/SendQuote.js"></script>
     <script src="/js/GetUsers.js"></script>
-    <?php include '/includes/footer.php'; ?> <!-- Footer -->
+    <?php include 'includes/footer.php'; ?> <!-- Footer -->
 
 </body>
 </html>
