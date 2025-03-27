@@ -1,7 +1,7 @@
 function getData() {
     let formData = new FormData(document.getElementById("get_users_form"));
 
-    fetch("../php/GetNames.php", {
+    fetch("/php/GetNames.php", {
         method: "POST",
         body: formData
     })
