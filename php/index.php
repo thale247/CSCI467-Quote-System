@@ -25,8 +25,12 @@ session_start();
       <input type="text" id="price" name="price"><br><br>
       <button type="button" onclick="sendData()">Submit</button>
     </form>
+    <form id="get_users_form"> <!-- action="SendPurchaseOrder.php" method="POST" -->
+      <button type="button" onclick="getData()">Pull names from Thomas's DB</button>
+    </form>
     <div id="response"></div>
     <script src="../js/SendQuote.js"></script>
+    <script src="../js/GetUsers.js"></script>
     <?php include '../includes/footer.php'; ?> <!-- Footer -->
 
 </body>
