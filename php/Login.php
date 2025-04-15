@@ -1,4 +1,7 @@
 <?php
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
     session_start();
 
     $host = getenv('DB_HOST'); // Access DB host from environment variable
@@ -14,10 +17,7 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
-    $sql = "SELECT * FROM Person";
-    $result = $conn->query($sql);
-
-    $userid = $_POST['user'];
+    $userid = $_POST['userid'];
     $password = $_POST['pass'];
 
     $stmt = $conn->prepare("SELECT * FROM Associate WHERE USERID = ? AND PASSWORD = ?");

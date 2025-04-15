@@ -26,8 +26,8 @@ session_start();
     <div id="loginDiv">
       <h1>Login:</h1>
       <form action="php/Login.php" method="POST" id="login_form">
-        <label for="userID">UserID:</label>
-        <input type="text" id="userID" name="userID"><br><br>
+        <label for="userid">UserID:</label>
+        <input type="text" id="userid" name="userid"><br><br>
         <label for="pass">Password:</label>
         <input type="password" id="pass" name="pass"><br><br>
         <button type="submit">Login</button>
