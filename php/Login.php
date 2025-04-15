@@ -17,7 +17,7 @@
     $sql = "SELECT * FROM Person";
     $result = $conn->query($sql);
 
-    $userid = $_POST['user'];
+    $userid = $_POST['userid'];
     $password = $_POST['pass'];
 
     $stmt = $conn->prepare("SELECT * FROM Associate WHERE USERID = ? AND PASSWORD = ?");
