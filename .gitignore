@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+*.sql
+
+settings.json
+
 # Distribution / packaging
 .Python
 build/
