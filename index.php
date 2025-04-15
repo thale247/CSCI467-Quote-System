@@ -12,7 +12,7 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote System CSCI 467 test</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/home/site/wwwroot/css/styles.css">
 </head>
 <body>
 

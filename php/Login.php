@@ -1,5 +1,5 @@
 <?php
-    session_start()
+    session_start();
 
     $host = getenv('DB_HOST'); // Access DB host from environment variable
     $username = getenv('DB_USER'); // Access DB username from environment variable
