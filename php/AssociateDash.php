@@ -165,7 +165,7 @@ $quote_result = $conn->query($quote_query);
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars($quote['quote_id']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
-                    echo "<td>" . "<button onclick=\"openExistingQuote(" . $quote['customer_id'] . ") value=\"Edit\"/>" . "</td>";
+                    echo "<td>" . "<button onclick=\"openExistingQuote(" . $quote['customer_id'] . ")>Edit</button>" . "</td>";
                     echo "</tr>";
                 }
             } else {
