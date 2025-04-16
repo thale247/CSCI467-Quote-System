@@ -24,7 +24,7 @@ session_start();
       <button type="button" onclick="sendData()">Submit</button>
     </form> -->
     <div id="loginDiv">
-      <h1>Login:</h1>
+      <h1 id="welcomeText">Welcome</h1>
       <form action="php/Login.php" method="POST" id="login_form">
         <label for="userid">UserID:</label>
         <input type="text" id="userid" name="userid"><br><br>
@@ -39,7 +39,19 @@ session_start();
     <div id="response"></div>
     <script src="/js/SendQuote.js"></script>
     <script src="/js/GetUsers.js"></script> -->
-    <?php include 'includes/footer.php'; ?> <!-- Footer -->
+    <!-- <script src="/js/LoginPage.js"> -->
+    <script>
+      window.addEventListener('DOMContentLoaded', function () {
+        const welcomeHeader = document.getElementById("welcomeText");
+        const now = new Date();
+        const hour = now.getHours();
 
+        if (hour < 12) {
+          welcomeHeader.textContent = "Good morning";
+        } else {
+          welcomeHeader.textContent = "Good afternoon";
+        }
+      });
+    </script>
 </body>
 </html>
