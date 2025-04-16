@@ -19,9 +19,10 @@
     
     if ($result->num_rows > 0) {
         // Login success
+        $row = $result->fetch_row();
         $_SESSION['userid'] = $userid;
-        $_SESSION['first'] = $result[0][1];
-        $_SESSION['last'] = $result[0][2];
+        $_SESSION['first'] = $row[1];
+        $_SESSION['last'] = $row[2];
         header("Location: AssociateDash.php");  // Redirect to dashboard
         exit();
     } else {
