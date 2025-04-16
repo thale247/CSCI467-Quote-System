@@ -76,6 +76,21 @@ $quote_result = $conn->query($quote_query);
             background-color: #45a049;
         }
 
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -109,8 +124,8 @@ $quote_result = $conn->query($quote_query);
                 alert("Please select a customer first.");
             }
         }
-        function openExistingQuote() {
-            window.open("newquote.php?customer_id=1", "New Quote", "width=600,height=400");
+        function openExistingQuote(cust_id) {
+            window.open("newquote.php?customer_id=" + cust_id, "New Quote", "width=600,height=400");
         }
     </script>
 </head>
@@ -140,6 +155,7 @@ $quote_result = $conn->query($quote_query);
             <tr>
                 <th>Quote ID</th>
                 <th>Total Amount ($)</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -149,7 +165,7 @@ $quote_result = $conn->query($quote_query);
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars($quote['quote_id']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
-                    echo "<td>" . "<button onclick=\"openExistingQuote()\" value=\"Edit\"/>" . "</td>";
+                    echo "<td>" . "<button onclick=\"openExistingQuote(" . $quote['customer_id'] . ") value=\"Edit\"/>" . "</td>";
                     echo "</tr>";
                 }
             } else {

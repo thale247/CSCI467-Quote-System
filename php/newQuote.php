@@ -53,8 +53,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $discounted_total = $total * (1 - $discount / 100);
     $total = number_format($discounted_total, 2, '.', '');
 
-    $insert = "INSERT INTO Quote (customer_email, items, item_prices, secret_notes, discount_percentage, total_amount)
-               VALUES ('$email', '$items', '$prices', '$notes', '$discount', '$total')";
+    $insert = "INSERT INTO Quote (customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id)
+               VALUES ('$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id)";
 
     if ($conn->query($insert) === TRUE) {
         echo "<p style='font-weight:bold;'>Quote successfully submitted!</p>";
