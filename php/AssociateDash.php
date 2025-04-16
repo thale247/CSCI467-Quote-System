@@ -14,7 +14,7 @@ $customer_query = "SELECT id, name FROM customers";
 $customer_result = $legacy_conn->query($customer_query);
 
 // Query for current quotes from the quote database
-$quote_db = new mysqli('71.228.20.16', 'connor', 'Hlb20!hello', 'quoteSystem');
+$quote_db = new mysqli('71.228.20.16', 'user', 'pass', 'quoteSystem');
 if ($quote_db->connect_error) {
     die("Quote DB connection failed: " . $quote_db->connect_error);
 }
