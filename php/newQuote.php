@@ -40,7 +40,7 @@ if (isset($_GET['customer_id'])) {
 // MANUAL LOCAL DATABASE CONNECTION I CANT FIGURE OUT WHAT TO DO SORRY
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Connect to local db for quoteSystem
-    $quote_db = new mysqli('71.228.20.16', 'connor', 'Hlb20!hello', 'quoteSystem');
+    $quote_db = new mysqli('71.228.20.16', 'user', 'pass', 'quoteSystem');
     if ($quote_db->connect_error) {
         die("Quote DB connection failed: " . $quote_db->connect_error);
     }
