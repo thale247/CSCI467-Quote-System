@@ -5,20 +5,25 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+$host = getenv('DB_HOST'); // Access DB host from environment variable
+$username = getenv('DB_USER'); // Access DB username from environment variable
+$password = getenv('DB_PASS'); // Access DB password from environment variable
+$database = 'quoteSystem'; // Access DB name from environment variable
+
 // Once user is logged in:
 if (!isset($_SESSION['userid'])) {
-    header("Location: login.php");
+    header("Location: Login.php");
     exit();
 }
 
-include('db_connect_legacy.php');
+include('../includes/db_connect_legacy.php');
 
 // Query for customer list
 $customer_query = "SELECT id, name FROM customers";
 $customer_result = $legacy_conn->query($customer_query);
 
 // Query for current quotes from the quote database
-$quote_db = new mysqli('71.228.20.16', 'user', 'pass', 'quoteSystem');
+$quote_db = new mysqli($host, $username, $password, $database );
 if ($quote_db->connect_error) {
     die("Quote DB connection failed: " . $quote_db->connect_error);
 }
