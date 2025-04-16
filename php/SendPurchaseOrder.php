@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 function generateOrderID() {
     $uniquePart = uniqid();
     return "3-$uniquePart-B";
@@ -7,7 +9,7 @@ function generateOrderID() {
 $url = 'http://blitz.cs.niu.edu/PurchaseOrder/';
 $data = array(
 	'order' => generateOrderID(), 
-	'associate' => 'RE-676732',
+	'associate' => $_SESSION['userid'],
 	'custid' => $_POST['user'], 
 	'amount' => $_POST['price']);
 		
