@@ -5,84 +5,134 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$host = getenv('DB_HOST'); // Access DB host from environment variable
-$username = getenv('DB_USER'); // Access DB username from environment variable
-$password = getenv('DB_PASS'); // Access DB password from environment variable
-$database = 'quoteSystem'; // Access DB name from environment variable
-
-// Once user is logged in:
 if (!isset($_SESSION['userid'])) {
     header("Location: Login.php");
     exit();
 }
 
+include('../includes/db_connect.php');
 include('../includes/db_connect_legacy.php');
 
-// Query for customer list
 $customer_query = "SELECT id, name FROM customers";
 $customer_result = $legacy_conn->query($customer_query);
 
-// Query for current quotes from the quote database
-$quote_db = new mysqli($host, $username, $password, $database );
-if ($quote_db->connect_error) {
-    die("Quote DB connection failed: " . $quote_db->connect_error);
-}
-
 $quote_query = "SELECT quote_id, total_amount FROM Quote";
-$quote_result = $quote_db->query($quote_query);
+$quote_result = $conn->query($quote_query);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>Quote Dashboard</title>
+    <style>
+        body {
+            background-color: #f4f4f9;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h2, h3 {
+            color: #333;
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            color: #444;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        input[type="button"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="button"]:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #e8e8e8;
+            color: #333;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
     <script type="text/javascript">
-        // JS for pop-up new quote insertion
-        function openNewQuote() 
-        {
-            // get customer ID selected 
+        function openNewQuote() {
             var customer_id = document.getElementById("customer").value;
-            if (customer_id) 
-            {
-                // open new window with newQuote.php
+            if (customer_id) {
                 window.open("newquote.php?customer_id=" + customer_id, "New Quote", "width=600,height=400");
-            } else 
-            {
+            } else {
                 alert("Please select a customer first.");
             }
         }
     </script>
 </head>
 <body>
-    <h2>ASSOCIATE DASHBOARD: Welcome, <?php echo htmlspecialchars($_SESSION['userid']); ?>!</h2>
+    <h2 style="margin-bottom: 30px;">ASSOCIATE DASHBOARD: Welcome, <?php echo htmlspecialchars($_SESSION['first']); ?>!</h2>
 
     <form>
-        <!-- Dropdown for selecting a customer -->
         <label for="customer">Select a Customer:</label>
         <select name="customer_id" id="customer" required>
             <option value="">-- Choose Customer --</option>
             <?php
-            // check for results 
-            if ($customer_result && $customer_result->num_rows > 0) 
-            {
-                // loop for customers
-                while ($row = $customer_result->fetch_assoc()) 
-                {
+            if ($customer_result && $customer_result->num_rows > 0) {
+                while ($row = $customer_result->fetch_assoc()) {
                     echo "<option value='{$row['id']}'>" . htmlspecialchars($row['name']) . "</option>";
                 }
             } else {
-                // no customers found
                 echo "<option disabled>No customers found</option>";
             }
             ?>
         </select>
-        <br><br>
-        <!--calls JS function to open a new quote -->
         <input type="button" value="New Quote" onclick="openNewQuote()">
     </form>
 
     <h3>Current Quotes:</h3>
-    <table border="1">
+    <table border="0">
         <thead>
             <tr>
                 <th>Quote ID</th>
@@ -91,7 +141,6 @@ $quote_result = $quote_db->query($quote_query);
         </thead>
         <tbody>
             <?php
-            // Check if quotes exist
             if ($quote_result && $quote_result->num_rows > 0) {
                 while ($quote = $quote_result->fetch_assoc()) {
                     echo "<tr>";
@@ -105,14 +154,10 @@ $quote_result = $quote_db->query($quote_query);
             ?>
         </tbody>
     </table>
-
 </body>
 </html>
 
 <?php
-// Close the quote database connection
-$quote_db->close();
-
-// Close the legacy database connection
+$conn->close();
 $legacy_conn->close();
 ?>

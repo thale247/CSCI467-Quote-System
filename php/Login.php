@@ -5,18 +5,8 @@
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
 
-    $host = getenv('DB_HOST'); // Access DB host from environment variable
-    $username = getenv('DB_USER'); // Access DB username from environment variable
-    $password = getenv('DB_PASS'); // Access DB password from environment variable
-    $database = 'quoteSystem'; // Access DB name from environment variable
 
-    // Create a connection to the database
-    $conn = new mysqli($host, $username, $password, $database);
-
-    // Check the connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+    include('../includes/db_connect.php');
 
     $userid = $_POST['userid'];
     $password = $_POST['pass'];
@@ -30,6 +20,8 @@
     if ($result->num_rows > 0) {
         // Login success
         $_SESSION['userid'] = $userid;
+        $_SESSION['first'] = $result[1];
+        $_SESSION['last'] = $result[2];
         header("Location: AssociateDash.php");  // Redirect to dashboard
         exit();
     } else {
