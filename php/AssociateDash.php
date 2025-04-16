@@ -12,6 +12,15 @@ include('db_connect_legacy.php');
 // Query for customer list
 $customer_query = "SELECT id, name FROM customers";
 $customer_result = $legacy_conn->query($customer_query);
+
+// Query for current quotes from the quote database
+$quote_db = new mysqli('71.228.20.16', 'connor', 'Hlb20!hello', 'quoteSystem');
+if ($quote_db->connect_error) {
+    die("Quote DB connection failed: " . $quote_db->connect_error);
+}
+
+$quote_query = "SELECT quote_id, total_amount FROM Quote";
+$quote_result = $quote_db->query($quote_query);
 ?>
 
 <!DOCTYPE html>
@@ -39,7 +48,7 @@ $customer_result = $legacy_conn->query($customer_query);
     <h2>ASSOCIATE DASHBOARD: Welcome, <?php echo htmlspecialchars($_SESSION['userid']); ?>!</h2>
 
     <form>
-         <!-- Dropdown for selecting a customer -->
+        <!-- Dropdown for selecting a customer -->
         <label for="customer">Select a Customer:</label>
         <select name="customer_id" id="customer" required>
             <option value="">-- Choose Customer --</option>
@@ -62,9 +71,39 @@ $customer_result = $legacy_conn->query($customer_query);
         <!--calls JS function to open a new quote -->
         <input type="button" value="New Quote" onclick="openNewQuote()">
     </form>
+
+    <h3>Current Quotes:</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Quote ID</th>
+                <th>Total Amount ($)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Check if quotes exist
+            if ($quote_result && $quote_result->num_rows > 0) {
+                while ($quote = $quote_result->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td>" . htmlspecialchars($quote['quote_id']) . "</td>";
+                    echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='2'>No quotes found.</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+
 </body>
 </html>
 
 <?php
+// Close the quote database connection
+$quote_db->close();
+
+// Close the legacy database connection
 $legacy_conn->close();
 ?>
