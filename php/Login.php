@@ -20,8 +20,8 @@
     if ($result->num_rows > 0) {
         // Login success
         $_SESSION['userid'] = $userid;
-        $_SESSION['first'] = $result[1];
-        $_SESSION['last'] = $result[2];
+        $_SESSION['first'] = $result[0][1];
+        $_SESSION['last'] = $result[0][2];
         header("Location: AssociateDash.php");  // Redirect to dashboard
         exit();
     } else {
