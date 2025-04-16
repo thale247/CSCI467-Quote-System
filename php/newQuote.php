@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+$host = getenv('DB_HOST'); // Access DB host from environment variable
+$username = getenv('DB_USER'); // Access DB username from environment variable
+$password = getenv('DB_PASS'); // Access DB password from environment variable
+$database = 'quoteSystem'; // Access DB name from environment variable
+
 // Check for user login
 if (!isset($_SESSION['userid'])) {
     header("Location: login.php");
@@ -40,7 +45,7 @@ if (isset($_GET['customer_id'])) {
 // MANUAL LOCAL DATABASE CONNECTION I CANT FIGURE OUT WHAT TO DO SORRY
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Connect to local db for quoteSystem
-    $quote_db = new mysqli('71.228.20.16', 'user', 'pass', 'quoteSystem');
+    $quote_db = new mysqli($host, $username, $password, $database );
     if ($quote_db->connect_error) {
         die("Quote DB connection failed: " . $quote_db->connect_error);
     }
