@@ -29,8 +29,8 @@
     if ($result->num_rows > 0) {
         // Login success
         $_SESSION['userid'] = $userid;
-        echo "Login successful. Welcome, $userid!";
-        // redirect or load dashboard...
+        header("Location: php/AssociateDash.php");  // Redirect to dashboard
+        exit();
     } else {
         echo "Invalid USERID or PASSWORD.";
     }
