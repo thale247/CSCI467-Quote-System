@@ -1,8 +1,9 @@
 <?php
+    session_start();
+
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
-    session_start();
 
     $host = getenv('DB_HOST'); // Access DB host from environment variable
     $username = getenv('DB_USER'); // Access DB username from environment variable
@@ -29,7 +30,7 @@
     if ($result->num_rows > 0) {
         // Login success
         $_SESSION['userid'] = $userid;
-        header("Location: php/AssociateDash.php");  // Redirect to dashboard
+        header("Location: AssociateDash.php");  // Redirect to dashboard
         exit();
     } else {
         echo "Invalid USERID or PASSWORD.";
