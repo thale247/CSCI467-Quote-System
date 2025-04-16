@@ -109,10 +109,13 @@ $quote_result = $conn->query($quote_query);
                 alert("Please select a customer first.");
             }
         }
+        function openExistingQuote() {
+            window.open("newquote.php?customer_id=1", "New Quote", "width=600,height=400");
+        }
     </script>
 </head>
 <body>
-    <h2 style="margin-bottom: 30px;">ASSOCIATE DASHBOARD: Welcome, <?php echo htmlspecialchars($_SESSION['first']); ?>!</h2>
+    <h2 style="margin-bottom: 30px;">Welcome, <?php echo htmlspecialchars($_SESSION['first']); ?>!</h2>
 
     <form>
         <label for="customer">Select a Customer:</label>
@@ -146,6 +149,7 @@ $quote_result = $conn->query($quote_query);
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars($quote['quote_id']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
+                    echo "<td>" . "<button onclick=\"openExistingQuote()\" value=\"Edit\"/>" . "</td>";
                     echo "</tr>";
                 }
             } else {
