@@ -31,13 +31,32 @@ if (isset($_GET['customer_id'])) {
     die("No customer selected.");
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $conn = new mysqli($host, $username, $password, $database );
-    if ($conn->connect_error) {
-        die("Quote DB connection failed: " . $conn->connect_error);
+$quote_email = $quote_notes = $quote_discount = $quote_price = $quote_items = $quote_item_prices = "";
+
+if (isset($_GET['quote_id'])) {
+    $quote_id = $_GET['quote_id'];
+    $query = "SELECT * FROM Quote WHERE quote_id = '$quote_id'";
+    $result = $conn->query($query);
+
+    if ($result && $result->num_rows > 0) {
+        $quote = $result->fetch_assoc();
+        $quote_email = $quote['customer_email'];
+        $quote_notes = $quote['secret_notes'];
+        $quote_discount = $quote['discount_percentage'];
+        $quote_price = $quote['total_amount'];
+        $quote_items = $quote['items'];
+        $quote_item_prices = $quote['item_prices'];
+    } else {
+        die("Quote not found.");
     }
+} else {
+    die("No Quote selected.");
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $cust_id = $conn->real_escape_string($_POST['customer_id']);
+    $quote_id = $conn->real_escape_string($_POST['quote_id']);
     $email = $conn->real_escape_string($_POST['email']);
     $items = $conn->real_escape_string($_POST['items']);
     $prices = $conn->real_escape_string($_POST['prices']);
@@ -53,8 +72,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $discounted_total = $total * (1 - $discount / 100);
     $total = number_format($discounted_total, 2, '.', '');
 
-    $insert = "INSERT INTO Quote (created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id)
-               VALUES ('{$_SESSION['userid']}', '$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id)";
+    $insert = "UPDATE Quote SET customer_email = '$email', items = '$items', item_prices = '$prices',
+                secret_notes = '$notes', discount_percentage = '$discount', total_amount = '$total',
+                customer_id = $cust_id
+                WHERE quote_id = '$quote_id'";
 
     if ($conn->query($insert) === TRUE) {
         echo "<p style='font-weight:bold;'>Quote successfully submitted!</p>";
@@ -84,9 +105,10 @@ $legacy_conn->close();
 
     <form method="post" onsubmit="return prepare();">
         <input type="hidden" name="customer_id" value="<?php echo htmlspecialchars($customer_id); ?>">
+        <input type="hidden" name="quote_id" value="<?php echo htmlspecialchars($quote_id); ?>">
 
         <label for="email">Customer Email:</label><br>
-        <input type="email" name="email" id="email" required style="margin-bottom: 15px; padding: 5px;"><br>
+        <input type="email" name="email" id="email" required value="<?php echo htmlspecialchars($quote_email); ?>" style="margin-bottom: 15px; padding: 5px;"><br>
 
         <h3>Items</h3>
 
@@ -102,10 +124,10 @@ $legacy_conn->close();
         <input type="hidden" name="prices" id="prices-hidden">
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Secret Notes:</div>
-        <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;"></textarea><br><br>
+        <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;"><?php echo htmlspecialchars($quote_notes); ?></textarea><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
-        <input type="number" name="discount" id="discount" step="0.01" value="0" oninput="calculateTotal()" style="padding: 5px;"><br><br>
+        <input type="number" name="discount" id="discount" step="0.01" value="<?php echo htmlspecialchars($quote_discount); ?>" oninput="calculateTotal()" style="padding: 5px;"><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
         <div id="total-amount" style="font-weight: bold; font-size: 18px;">$0.00</div><br><br>
@@ -171,6 +193,21 @@ $legacy_conn->close();
         }
 
         calculateTotal();
+
+        const existingItems = "<?php echo addslashes($quote_items); ?>".split(",");
+        const existingPrices = "<?php echo addslashes($quote_item_prices); ?>".split(",");
+
+        window.addEventListener("DOMContentLoaded", () => {
+            for (let i = 0; i < existingItems.length; i++) {
+                if (existingItems[i].trim() !== "") {
+                    addItem();
+                    const row = document.querySelectorAll("#items-container > div")[i];
+                    row.querySelector(".item-name").value = existingItems[i];
+                    row.querySelector(".item-price").value = existingPrices[i] || "";
+                }
+            }
+            calculateTotal();
+        });
     </script>
 </body>
 </html>
