@@ -127,7 +127,7 @@ $quote_result = $conn->query($quote_query);
         }
         function openExistingQuote(cust_id, quote_id) {
             if(cust_id && quote_id) {
-                window.open("editquote.php?customer_id=" + cust_id + "quote_id=" + quote_id, "New Quote", "width=600,height=400");
+                window.open("editquote.php?customer_id=" + cust_id + "&quote_id=" + quote_id, "New Quote", "width=600,height=400");
             }
         }
     </script>
