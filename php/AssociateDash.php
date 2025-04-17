@@ -125,8 +125,10 @@ $quote_result = $conn->query($quote_query);
                 alert("Please select a customer first.");
             }
         }
-        function openExistingQuote(cust_id) {
-            window.open("newquote.php?customer_id=" + cust_id, "New Quote", "width=600,height=400");
+        function openExistingQuote(cust_id, quote_id) {
+            if(cust_id && quote_id) {
+                window.open("editquote.php?customer_id=" + cust_id + "quote_id=" + quote_id, "New Quote", "width=600,height=400");
+            }
         }
     </script>
 </head>
@@ -163,11 +165,12 @@ $quote_result = $conn->query($quote_query);
             <?php
             if ($quote_result && $quote_result->num_rows > 0) {
                 while ($quote = $quote_result->fetch_assoc()) {
+                    $qid = htmlspecialchars($quote['quote_id']);
                     echo "<tr>";
-                    echo "<td>" . htmlspecialchars($quote['quote_id']) . "</td>";
+                    echo "<td>" . $qid . "</td>";
                     echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
                     $cid = htmlspecialchars($quote['customer_id'], ENT_QUOTES);
-                    echo "<td><button onclick=\"openExistingQuote('$cid')\">Edit</button></td>";
+                    echo "<td><button onclick=\"openExistingQuote('$cid', '$qid')\">Edit</button></td>";
                     echo "</tr>";
                 }
             } else {
