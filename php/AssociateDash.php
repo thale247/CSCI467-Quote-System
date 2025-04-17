@@ -17,7 +17,7 @@ $customer_query = "SELECT id, name FROM customers";
 $customer_result = $legacy_conn->query($customer_query);
 
 
-$quote_query = "SELECT quote_id, total_amount, customer_id FROM Quote WHERE created_by like '$_SESSION['userid']'";
+$quote_query = "SELECT quote_id, total_amount, customer_id FROM Quote WHERE created_by LIKE '{$_SESSION['userid']}'";
 $quote_result = $conn->query($quote_query);
 ?>
 
@@ -166,7 +166,8 @@ $quote_result = $conn->query($quote_query);
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars($quote['quote_id']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
-                    echo "<td>" . "<button onclick=\"openExistingQuote(" . htmlspecialchars($quote['customer_id']) . ")>Edit</button>" . "</td>";
+                    $cid = htmlspecialchars($quote['customer_id'], ENT_QUOTES);
+                    echo "<td><button onclick=\"openExistingQuote('$cid')\">Edit</button></td>";
                     echo "</tr>";
                 }
             } else {
