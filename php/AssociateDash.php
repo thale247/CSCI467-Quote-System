@@ -16,7 +16,8 @@ include('../includes/db_connect_legacy.php');
 $customer_query = "SELECT id, name FROM customers";
 $customer_result = $legacy_conn->query($customer_query);
 
-$quote_query = "SELECT quote_id, total_amount, customer_id FROM Quote WHERE created_by = '$_SESSION['userid']'";
+
+$quote_query = "SELECT quote_id, total_amount, customer_id FROM Quote WHERE created_by like '$_SESSION['userid']'";
 $quote_result = $conn->query($quote_query);
 ?>
 
