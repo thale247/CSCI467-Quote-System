@@ -25,9 +25,8 @@
         $_SESSION['last'] = $row[2];
         header("Location: AssociateDash.php");  // Redirect to dashboard
         exit();
-    } else {
-        echo "Invalid USERID or PASSWORD.";
-    }
+    } 
+    
     $stmt = $conn->prepare("SELECT * FROM Admin WHERE USERID = ? AND PASSWORD = ?");
     $stmt->bind_param("ss", $userid, $password);
     $stmt->execute();
