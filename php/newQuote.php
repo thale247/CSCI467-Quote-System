@@ -142,9 +142,9 @@ $legacy_conn->close();
                 total += parseFloat(input.value) || 0;
             });
 
-            const discount = parseFloat(document.getElementById("discount").value) || 0;
-            const discountedTotal = total * (1 - discount / 100);
-            document.getElementById("total-amount").textContent = `$${discountedTotal.toFixed(2)}`;
+            //const discount = parseFloat(document.getElementById("discount").value) || 0;
+            //const discountedTotal = total * (1 - discount / 100);
+            document.getElementById("total-amount").textContent = `$${total.toFixed(2)}`;
         }
 
         function prepare() {
