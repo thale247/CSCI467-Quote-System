@@ -146,7 +146,7 @@ $legacy_conn->close();
 
             row.innerHTML = `
                 <input type="text" placeholder="Item Name" class="item-name" required style="padding: 5px;">
-                <input type="number" step="0.01" placeholder="Price" class="item-price" required style="padding: 5px;">
+                <input type="number" step="0.01" placeholder="Price" class="item-price" oninput="calculateTotal()" required style="padding: 5px;">
                 <button type="button" onclick="removeItem(this)" style="background-color: black; color: white; border: none; padding: 4px 10px; font-weight: bold; font-size: 16px; cursor: pointer; line-height: 1;">X</button>
             `;
             container.appendChild(row);
