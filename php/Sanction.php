@@ -117,17 +117,9 @@ $quote_result = $conn->query($quote_query);
         }
     </style>
     <script type="text/javascript">
-        function openNewQuote() {
-            var customer_id = document.getElementById("customer").value;
-            if (customer_id) {
-                window.open("newquote.php?customer_id=" + customer_id, "New Quote", "width=600,height=400");
-            } else {
-                alert("Please select a customer first.");
-            }
-        }
         function openExistingQuote(cust_id, quote_id) {
             if(cust_id && quote_id) {
-                window.open("editquote.php?customer_id=" + cust_id + "&quote_id=" + quote_id, "New Quote", "width=600,height=400");
+                window.open("SanctionQuote.php?customer_id=" + cust_id + "&quote_id=" + quote_id, "Sanction Quote", "width=600,height=400");
             }
         }
     </script>
@@ -160,7 +152,7 @@ $quote_result = $conn->query($quote_query);
                     echo "<td>" . htmlspecialchars($quote['customer_id']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
                     $cid = htmlspecialchars($quote['customer_id'], ENT_QUOTES);
-                    echo "<td><button onclick=\"openExistingQuote('$cid', '$qid')\">Finalize</button></td>";
+                    echo "<td><button onclick=\"openExistingQuote('$cid', '$qid')\">Sanction</button></td>";
                     echo "</tr>";
                 }
             } else {
