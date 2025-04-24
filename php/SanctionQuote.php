@@ -4,7 +4,7 @@ session_start();
 include('../includes/db_connect.php');
 
 if (!isset($_SESSION['userid'])) {
-    header("Location: login.php");
+    header("Location: Login.php");
     exit();
 }
 
