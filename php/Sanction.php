@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 if (!isset($_SESSION['userid'])) {
-    header("Location: ../index.php");
+    header("Location: index.php");
     exit();
 }
 
@@ -18,7 +18,7 @@ $customer_result = $legacy_conn->query($customer_query);
 
 
 $quote_query =  "SELECT quote_id, created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, created, customer_id, status FROM Quote
-                    WHERE `status` = 'finalized'";
+                    WHERE `status` = 'unresolved'";
 $quote_result = $conn->query($quote_query);
 ?>
 
@@ -127,9 +127,15 @@ $quote_result = $conn->query($quote_query);
 </head>
 <body>
     <h2 style="margin-bottom: 30px;">Welcome, <?php echo htmlspecialchars($_SESSION['first']); ?>!</h2>
+    <form action="Sanction.php" method="post" style="display:inline;">
+        <button type:"submit">Sanction Order</button>
+    </form>
+    <form action="ProcessingOrder.php" method="post" style="display:inline;">
+        <button type:"submit">Process Order</button>
+    </form>
 
 
-    <h3>Finalized Quotes:</h3>
+    <h3>Sanction Quotes:</h3>
     <table border="0">
         <thead>
             <tr>
