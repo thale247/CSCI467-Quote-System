@@ -219,6 +219,21 @@ $legacy_conn->close();
         }
 
         calculateTotal();
+
+        const existingItems = "<?php echo addslashes($quote_items); ?>".split(",");
+        const existingPrices = "<?php echo addslashes($quote_item_prices); ?>".split(",");
+
+        window.addEventListener("DOMContentLoaded", () => {
+            for (let i = 0; i < existingItems.length; i++) {
+                if (existingItems[i].trim() !== "") {
+                    addItem();
+                    const row = document.querySelectorAll("#items-container > div")[i];
+                    row.querySelector(".item-name").value = existingItems[i];
+                    row.querySelector(".item-price").value = existingPrices[i] || "";
+                }
+            }
+            calculateTotal();
+        });
     </script>
 </body>
 </html>
