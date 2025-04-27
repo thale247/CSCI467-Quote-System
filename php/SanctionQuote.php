@@ -121,7 +121,7 @@ $legacy_conn->close();
     <form method="post" onsubmit="return prepare();">
         <input type="hidden" name="customer_id" value="<?php echo htmlspecialchars($customer_id); ?>">
 
-        <input type="email" value="<?php echo htmlspecialchars($customer_email); ?>" readonly 
+        <input type="email" name="email" value="<?php echo htmlspecialchars($customer_email); ?>" readonly 
          style="margin-bottom: 15px; padding: 5px; background-color: #eee; border: 1px solid #ccc;">
 
 
