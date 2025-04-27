@@ -72,12 +72,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $discounted_total = $total * (1 - $discount / 100);
     $total = number_format($discounted_total, 2, '.', '');
 
-    $insert = "UPDATE Quote SET customer_email = '$email', items = '$items', item_prices = '$prices',
+    $update = "UPDATE Quote SET customer_email = '$email', items = '$items', item_prices = '$prices',
                 secret_notes = '$notes', discount_percentage = '$discount', total_amount = '$total',
                 customer_id = $cust_id
                 WHERE quote_id = '$quote_id'";
 
-    if ($conn->query($insert) === TRUE) {
+    if ($conn->query($update) === TRUE) {
         echo "<p style='font-weight:bold;'>Quote successfully submitted!</p>";
     } else {
         echo "<p style='font-weight:bold;'>Error: " . $conn->error . "</p>";

@@ -33,7 +33,7 @@ if (isset($_GET['customer_id'])) {
 //Set up quote fetch
 if (isset($_GET['quote_id'])) {
     $quote_id = $_GET['quote_id'];
-    $quote_query = "SELECT customer_email, items, item_prices, secret_notes, total_amount, status FROM Quote WHERE quote_id = '$quote_id'";
+    $quote_query = "SELECT * FROM Quote WHERE quote_id = '$quote_id'";
     $quote_result = $conn->query($quote_query);
 
     if ($quote_result && $quote_result->num_rows > 0) {
@@ -53,6 +53,19 @@ if (isset($_GET['quote_id'])) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+    if (isset($_POST['sanction'])) {
+        $updateStatus = $conn->prepare("UPDATE Quote SET `status` = 'sanctioned' WHERE quote_id = ?");
+        $updateStatus->bind_param("s", $quote_id);
+        if ($updateStatus->execute()) {
+            echo "<p style='font-weight:bold; color: green;'>Quote successfully sanctioned!</p>";
+            header("Location: Sanction.php");
+            exit();
+        } else {
+            echo "<p style='font-weight:bold; color: red;'>Error: " . $updateStatus->error . "</p>";
+        }
+        $updateStatus->close();
+    } else {
+
 
     $cust_id = $conn->real_escape_string($_POST['customer_id']);
     $email = $conn->real_escape_string($_POST['email']);
@@ -70,14 +83,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $discounted_total = $total * (1 - $discount / 100);
     $total = number_format($discounted_total, 2, '.', '');
 
-    $insert = "INSERT INTO Quote (created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id)
-               VALUES ('{$_SESSION['userid']}', '$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id)";
+    $update = "UPDATE Quote SET customer_email = '$email', items = '$items', item_prices = '$prices',
+                secret_notes = '$notes', discount_percentage = '$discount', total_amount = '$total',
+                customer_id = $cust_id
+                WHERE quote_id = '$quote_id'";
 
-    if ($conn->query($insert) === TRUE) {
-        echo "<p style='font-weight:bold;'>Quote successfully submitted!</p>";
+    if ($conn->query($update) === TRUE) {
+        echo "<p style='font-weight:bold;'>Quote successfully updated!</p>";
     } else {
         echo "<p style='font-weight:bold;'>Error: " . $conn->error . "</p>";
     }
+}
 
     $conn->close();
 }
@@ -88,7 +104,7 @@ $legacy_conn->close();
 <!DOCTYPE html>
 <html>
 <head>
-    <title>New Quote</title>
+    <title>Sanction Quote</title>
 </head>
 <body style="font-family: Arial, sans-serif; padding: 20px;">
     <h2 style="margin-bottom: 10px;">Order From: <?php echo htmlspecialchars($customer_name); ?></h2>
@@ -131,7 +147,9 @@ $legacy_conn->close();
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
         <div id="total-amount" style="font-weight: bold; font-size: 18px;"><?php echo number_format($total_amount,2);?></div><br><br>
 
-        <input type="submit" value="Finalize Quote" style="padding: 10px 20px; font-weight: bold;">
+        <input type="submit" value="Update Quote" style="padding: 10px 20px; font-weight: bold;"><br><br>
+        <button type="button" onclick="submit_quote()" style="margin: 10px 0;">Submit Quote for Processing</button>
+
     </form>
 
     <script>
@@ -189,6 +207,15 @@ $legacy_conn->close();
 
             calculateTotal();
             return true;
+        }
+        function submit_quote() {
+            const form = document.querySelector('form');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'sanction';
+            hiddenInput.value = '1'; // mark this as a "sanction" submission
+            form.appendChild(hiddenInput);
+            form.submit();
         }
 
         calculateTotal();
