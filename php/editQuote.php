@@ -126,8 +126,8 @@ $legacy_conn->close();
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Secret Notes:</div>
         <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;"><?php echo htmlspecialchars($quote_notes); ?></textarea><br><br>
 
-        <!-- <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
-        <input type="number" name="discount" id="discount" step="0.01" value="<?php echo htmlspecialchars($quote_discount); ?>" oninput="calculateTotal()" style="padding: 5px;"><br><br> -->
+        <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
+        <input type="number" readonly name="discount" id="discount" step="0.01" value="<?php echo htmlspecialchars($quote_discount); ?>" oninput="calculateTotal()" style="padding: 5px;"><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
         <div id="total-amount" style="font-weight: bold; font-size: 18px;">$0.00</div><br><br>
