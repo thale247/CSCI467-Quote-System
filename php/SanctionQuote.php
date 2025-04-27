@@ -220,8 +220,8 @@ $legacy_conn->close();
 
         calculateTotal();
 
-        const existingItems = "<?php echo addslashes($quote_items); ?>".split(",");
-        const existingPrices = "<?php echo addslashes($quote_item_prices); ?>".split(",");
+        const existingItems = "<?php echo addslashes($items); ?>".split(",");
+        const existingPrices = "<?php echo addslashes($item_prices); ?>".split(",");
 
         window.addEventListener("DOMContentLoaded", () => {
             for (let i = 0; i < existingItems.length; i++) {
