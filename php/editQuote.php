@@ -55,6 +55,18 @@ if (isset($_GET['quote_id'])) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+    if (isset($_POST['submit_quote'])) {
+        $updateStatus = $conn->prepare("UPDATE Quote SET `status` = 'finalized' WHERE quote_id = ?");
+        $updateStatus->bind_param("s", $quote_id);
+        if ($updateStatus->execute()) {
+            echo "<p style='font-weight:bold; color: green;'>Quote successfully submitted!</p>";
+            header("Location: Sanction.php");
+            exit();
+        } else {
+            echo "<p style='font-weight:bold; color: red;'>Error: " . $updateStatus->error . "</p>";
+        }
+        $updateStatus->close();
+    } else {
     $cust_id = $conn->real_escape_string($_POST['customer_id']);
     $quote_id = $conn->real_escape_string($_POST['quote_id']);
     $email = $conn->real_escape_string($_POST['email']);
@@ -82,6 +94,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         echo "<p style='font-weight:bold;'>Error: " . $conn->error . "</p>";
     }
+
+}
 
     $conn->close();
 }
@@ -126,13 +140,14 @@ $legacy_conn->close();
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Secret Notes:</div>
         <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;"><?php echo htmlspecialchars($quote_notes); ?></textarea><br><br>
 
-        <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
-        <input type="number" readonly name="discount" id="discount" step="0.01" value="<?php echo htmlspecialchars($quote_discount); ?>" oninput="calculateTotal()" style="padding: 5px;"><br><br>
+        <!-- <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
+        <input type="number" readonly name="discount" id="discount" step="0.01" value="<?php echo htmlspecialchars($quote_discount); ?>" oninput="calculateTotal()" style="padding: 5px;"><br><br> -->
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
         <div id="total-amount" style="font-weight: bold; font-size: 18px;">$0.00</div><br><br>
 
         <input type="submit" value="Submit Quote" style="padding: 10px 20px; font-weight: bold;">
+        <button type="button" onclick="submit_quote()" style="margin: 10px 0;">Submit Quote for Sanctioning</button>
     </form>
 
     <script>
@@ -190,6 +205,16 @@ $legacy_conn->close();
 
             calculateTotal();
             return true;
+        }
+
+        function submit_quote() {
+            const form = document.querySelector('form');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'submit_quote';
+            hiddenInput.value = '1'; // mark this as a "sanction" submission
+            form.appendChild(hiddenInput);
+            form.submit();
         }
 
         calculateTotal();

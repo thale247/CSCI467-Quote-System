@@ -18,7 +18,7 @@ $customer_result = $legacy_conn->query($customer_query);
 
 
 $quote_query =  "SELECT quote_id, created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, created, customer_id, status FROM Quote
-                    WHERE `status` != 'sanctioned'";
+                    WHERE `status` = 'finalized'";
 $quote_result = $conn->query($quote_query);
 ?>
 
