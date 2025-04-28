@@ -21,7 +21,7 @@ $user_id = $_GET['user_id'];
 
 $sort_column = isset($_GET['sort_column']) ? $_GET['sort_column'] : 'quote_id';
 $sort_order = isset($_GET['sort_order']) && $_GET['sort_order'] == 'asc' ? 'asc' : 'desc';
-$quote_query = "SELECT quote_id, created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, created, status 
+$quote_query = "SELECT quote_id, created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, created, process_date, status 
                 FROM Quote WHERE created_by = ? ORDER BY $sort_column $sort_order";
 
 $stmt = $conn->prepare($quote_query);
@@ -115,6 +115,7 @@ $quote_result = $stmt->get_result();
                 <th><a href="?user_id=<?php echo htmlspecialchars($user_id); ?>&sort_column=total_amount&sort_order=<?php echo ($sort_column == 'total_amount' && $sort_order == 'asc') ? 'desc' : 'asc'; ?>">Total Amount</a></th>
                 <th><a href="?user_id=<?php echo htmlspecialchars($user_id); ?>&sort_column=created&sort_order=<?php echo ($sort_column == 'created' && $sort_order == 'asc') ? 'desc' : 'asc'; ?>">Created</a></th>
                 <th><a href="?user_id=<?php echo htmlspecialchars($user_id); ?>&sort_column=status&sort_order=<?php echo ($sort_column == 'status' && $sort_order == 'asc') ? 'desc' : 'asc'; ?>">Status</a></th>
+                <th><a href="?user_id=<?php echo htmlspecialchars($user_id); ?>&sort_column=process_date&sort_order=<?php echo ($sort_column == 'process_date' && $sort_order == 'asc') ? 'desc' : 'asc'; ?>">Process Date</a></th>
             </tr>
         </thead>
         <tbody>
@@ -131,6 +132,7 @@ $quote_result = $stmt->get_result();
                     echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['created']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['status']) . "</td>";
+                    echo "<td>" . htmlspecialchars($quote['process_date']) . "</td>";
                     echo "</tr>";
                 }
             } else {
