@@ -132,7 +132,7 @@ $quote_result = $stmt->get_result();
                     echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['created']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['status']) . "</td>";
-                    echo "<td>" . htmlspecialchars($quote['process_date']) . "</td>";
+                    echo "<td>" . htmlspecialchars($quote['process_date'] ?? '') . "</td>";
                     echo "</tr>";
                 }
             } else {
