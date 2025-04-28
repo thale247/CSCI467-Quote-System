@@ -134,6 +134,10 @@ $quote_result = $conn->query($quote_query);
         <button type:"submit">Process Order</button>
     </form>
 
+    <form action="admin.php" method="get" style="display:inline;">
+    <button type="submit">Admin data</button>
+    </form>
+
 
     <h3>Process Quotes:</h3>
     <table border="0">
