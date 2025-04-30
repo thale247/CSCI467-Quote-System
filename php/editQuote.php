@@ -29,6 +29,7 @@ if (isset($_GET['quote_id'])) {
         $quote_price = $quote['total_amount'];
         $quote_items = $quote['items'];
         $quote_item_prices = $quote['item_prices'];
+        $status = $quote['status'];
 
         // Fetch customer details from legacy database using customer_id from Quote table
         $customer_id = $quote['customer_id'];
@@ -58,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $updateStatus->bind_param("s", $quote_id);
         if ($updateStatus->execute()) {
             echo "<p style='font-weight:bold; color: green;'>Quote successfully submitted!</p>";
-            header("Location: Sanction.php");
+            //header("Location: Sanction.php");
             exit();
         } else {
             echo "<p style='font-weight:bold; color: red;'>Error: " . $updateStatus->error . "</p>";
