@@ -147,6 +147,17 @@ $associate_result = $conn->query($associate_query);
     </style>
 </head>
 <body>
+<div style="position: absolute; top:20px; right: 40px;">
+    <form action="logout.php" method="post" style="text-align: right; margin-bottomL 40px;">
+            <button type="submit" style="background-color: #4CAF50;color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;">
+            Logout
+    </button>
+    </form>
+    </div>
 
     <h2>Manage Associates</h2>
 
