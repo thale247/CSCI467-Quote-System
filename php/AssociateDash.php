@@ -182,7 +182,7 @@ $quote_result = $conn->query($quote_query);
                     echo "<tr>";
                     echo "<td>$qid</td>";
                     echo "<td>$cust_name</td>";
-                    echo "<td>$total</td>";
+                    echo "<td>$$total</td>";
                     echo "<td><button onclick=\"openExistingQuote('$qid')\">Edit</button></td>";
                     echo "</tr>";
                 }
