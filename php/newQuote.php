@@ -10,12 +10,13 @@ if (!isset($_SESSION['userid'])) {
 
 
 $userid = $_SESSION['userid'];
-$assoc_query = "SELECT FIRST, commission FROM Associate WHERE USERID = '$userid'";
+$assoc_query = "SELECT FIRST,LAST, commission FROM Associate WHERE USERID = '$userid'";
 $assoc_result = $conn->query($assoc_query);
 
 if ($assoc_result && $assoc_result->num_rows > 0) {
     $associate = $assoc_result->fetch_assoc();
     $associate_name = $associate['FIRST'];
+    $associate_name_last = $associate['LAST'];
     $current_commission = $associate['commission'];
 } else {
     die("Associate not found.");
@@ -63,8 +64,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $total = number_format($discounted_total, 2, '.', '');
 
    
-    $insert = "INSERT INTO Quote (created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id, customer_name, asc_name)
-               VALUES ('{$_SESSION['userid']}', '$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id, '$customer_name', '$associate_name')";
+    $insert = "INSERT INTO Quote (created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id, customer_name, asc_name, asc_name_last)
+               VALUES ('{$_SESSION['userid']}', '$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id, '$customer_name', '$associate_name','$associate_name_last')";
 
     if ($conn->query($insert) === TRUE) {
         echo "<p style='font-weight:bold;'>Quote successfully submitted!</p>";
