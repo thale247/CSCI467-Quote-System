@@ -16,6 +16,11 @@ include('../includes/db_connect_legacy.php');
 $customer_query = "SELECT id, name FROM customers";
 $customer_result = $legacy_conn->query($customer_query);
 
+$customer_names = [];
+while ($cust = $customer_result->fetch_assoc()) {
+    $customer_names[$cust['id']] = $cust['name'];
+}
+
 
 $quote_query =  "SELECT quote_id, created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, created, customer_id, status FROM Quote
                     WHERE `status` = 'sanctioned'";
@@ -126,6 +131,17 @@ $quote_result = $conn->query($quote_query);
     </script>
 </head>
 <body>
+<div style="position: absolute; top:20px; right: 40px;">
+    <form action="logout.php" method="post" style="text-align: right; margin-bottomL 40px;">
+            <button type="submit" style="background-color: #4CAF50;color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;">
+            Logout
+    </button>
+    </form>
+    </div>
     <h2 style="margin-bottom: 30px;">Welcome, <?php echo htmlspecialchars($_SESSION['first']); ?>!</h2>
     <form action="Sanction.php" method="post" style="display:inline;">
         <button type:"submit">Sanction Order</button>
@@ -160,14 +176,19 @@ $quote_result = $conn->query($quote_query);
                     echo "<td>" . $qid . "</td>";
                     echo "<td>" . htmlspecialchars($quote['created']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['created_by']) . "</td>";
-                    echo "<td>" . htmlspecialchars($quote['customer_id']) . "</td>";
+
+                    $cust_id = $quote['customer_id'];
+                    $cust_name = htmlspecialchars($customer_names[$cust_id] ?? 'Unknown');
+                    echo "<td>$cust_name</td>";
+
                     echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
-                    $cid = htmlspecialchars($quote['customer_id'], ENT_QUOTES);
-                    echo "<td><button onclick=\"openExistingQuote('$cid', '$qid')\">Finalize</button></td>";
+
+                    $cid = htmlspecialchars($cust_id, ENT_QUOTES);
+                    echo "<td><button onclick=\"openExistingQuote('$cid', '$qid')\">Sanction</button></td>";
                     echo "</tr>";
                 }
             } else {
-                echo "<tr><td colspan='2'>No quotes found.</td></tr>";
+                echo "<tr><td colspan='6'>No quotes found.</td></tr>";
             }
             ?>
         </tbody>
