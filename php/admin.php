@@ -171,8 +171,9 @@ $associate_result = $conn->query($associate_query);
                     <th>PASSWORD</th>
                     <th>Commission</th>
                     <th>Address</th>
-                    <th>Actions</th>
+                    <th>Save</th>
                     <th>View Quotes</th>
+                    <th>Delete</th>
                 </tr>
             </thead>
             <tbody>
@@ -191,7 +192,7 @@ $associate_result = $conn->query($associate_query);
                         echo "<td><input type='text' name='first_".$user_id."' value='".$first_name."' /></td>";
                         echo "<td><input type='text' name='last_".$user_id."' value='".$last_name."' /></td>";
                         echo "<td><input type='text' name='password_".$user_id."' value='".$password."' /></td>";
-                        echo "<td><input type='number' name='commission_".$user_id."' value='".$commission."' step='0.01' /></td>";
+                        echo "<td><input type='text' name='commission_".$user_id."' value='$".$commission."' step='0.01' /></td>";
                         echo "<td><input type='text' name='address_".$user_id."' value='".$address."' /></td>";
                         echo "<td><input type='submit' value='Save' name='save_".$user_id."'></td>";
                         echo "<td><form method='get' action='view.php' style='display:inline;'>
