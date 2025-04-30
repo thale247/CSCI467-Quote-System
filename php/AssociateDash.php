@@ -16,7 +16,7 @@ include('../includes/db_connect_legacy.php');
 $customer_query = "SELECT id, name FROM customers";
 $customer_result = $legacy_conn->query($customer_query);
 
-$quote_query = "SELECT quote_id, total_amount, customer_name FROM Quote WHERE created_by LIKE '{$_SESSION['userid']}'";
+$quote_query = "SELECT quote_id, total_amount, customer_name FROM Quote WHERE created_by LIKE '{$_SESSION['userid']}'AND status = 'unresolved'";
 $quote_result = $conn->query($quote_query);
 ?>
 
@@ -132,6 +132,17 @@ $quote_result = $conn->query($quote_query);
     </script>
 </head>
 <body>
+<div style="position: absolute; top:20px; right: 40px;">
+    <form action="logout.php" method="post" style="text-align: right; margin-bottomL 40px;">
+            <button type="submit" style="background-color: #4CAF50;color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;">
+            Logout
+    </button>
+    </form>
+    </div>
     <h2 style="margin-bottom: 30px;">Welcome, <?php echo htmlspecialchars($_SESSION['first']); ?>!</h2>
 
     <form>
