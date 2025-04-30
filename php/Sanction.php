@@ -22,7 +22,7 @@ while ($cust = $customer_result->fetch_assoc()) {
 }
 
 $quote_query =  "SELECT quote_id, created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, created, customer_id, status FROM Quote
-                    WHERE `status` = 'unresolved'";
+                    WHERE `status` = 'finalized'";
 $quote_result = $conn->query($quote_query);
 ?>
 
@@ -130,12 +130,26 @@ $quote_result = $conn->query($quote_query);
     </script>
 </head>
 <body>
+<div style="position: absolute; top:20px; right: 40px;">
+    <form action="logout.php" method="post" style="text-align: right; margin-bottomL 40px;">
+            <button type="submit" style="background-color: #4CAF50;color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;">
+            Logout
+    </button>
+    </form>
+    </div>
     <h2 style="margin-bottom: 30px;">Welcome, <?php echo htmlspecialchars($_SESSION['first']); ?>!</h2>
     <form action="Sanction.php" method="post" style="display:inline;">
         <button type="submit">Sanction Order</button>
     </form>
     <form action="ProcessingOrder.php" method="post" style="display:inline;">
         <button type="submit">Process Order</button>
+    </form>
+    <form action="admin.php" method="get" style="display:inline;">
+    <button type="submit">Admin data</button>
     </form>
 
     <h3>Sanction Quotes:</h3>
