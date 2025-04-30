@@ -181,10 +181,10 @@ $quote_result = $conn->query($quote_query);
                     $cust_name = htmlspecialchars($customer_names[$cust_id] ?? 'Unknown');
                     echo "<td>$cust_name</td>";
 
-                    echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
+                    echo "<td>$" . htmlspecialchars($quote['total_amount']) . "</td>";
 
                     $cid = htmlspecialchars($cust_id, ENT_QUOTES);
-                    echo "<td><button onclick=\"openExistingQuote('$cid', '$qid')\">Sanction</button></td>";
+                    echo "<td><button onclick=\"openExistingQuote('$cid', '$qid')\">Process Order</button></td>";
                     echo "</tr>";
                 }
             } else {
