@@ -8,6 +8,18 @@ if (!isset($_SESSION['userid'])) {
     exit();
 }
 
+// Get the associate's first name based on the session's user ID
+$userid = $_SESSION['userid'];
+$assoc_query = "SELECT FIRST FROM Associate WHERE USERID = '$userid'";
+$assoc_result = $conn->query($assoc_query);
+
+if ($assoc_result && $assoc_result->num_rows > 0) {
+    $associate = $assoc_result->fetch_assoc();
+    $associate_name = $associate['FIRST']; // First name of the associate
+} else {
+    die("Associate not found.");
+}
+
 $legacy_conn = new mysqli('blitz.cs.niu.edu', 'student', 'student', 'csci467', 3306);
 if ($legacy_conn->connect_error) {
     die("Connection to legacy DB failed: " . $legacy_conn->connect_error);
@@ -33,14 +45,13 @@ if (isset($_GET['customer_id'])) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-
     $cust_id = $conn->real_escape_string($_POST['customer_id']);
     $email = $conn->real_escape_string($_POST['email']);
     $items = $conn->real_escape_string($_POST['items']);
     $prices = $conn->real_escape_string($_POST['prices']);
     $notes = $conn->real_escape_string($_POST['notes']);
     $discount = floatval($_POST['discount']);
-
+    
     $item_prices = explode(",", $_POST['prices']); 
     $total = 0;
     foreach ($item_prices as $price) {
@@ -50,8 +61,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $discounted_total = $total * (1 - $discount / 100);
     $total = number_format($discounted_total, 2, '.', '');
 
-    $insert = "INSERT INTO Quote (created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id)
-               VALUES ('{$_SESSION['userid']}', '$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id)";
+    $insert = "INSERT INTO Quote (created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id, customer_name, asc_name)
+               VALUES ('{$_SESSION['userid']}', '$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id, '$customer_name', '$associate_name')";
 
     if ($conn->query($insert) === TRUE) {
         echo "<p style='font-weight:bold;'>Quote successfully submitted!</p>";
@@ -101,8 +112,8 @@ $legacy_conn->close();
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Secret Notes:</div>
         <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;"></textarea><br><br>
 
-        <!-- <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
-        <input type="number" name="discount" id="discount" step="0.01" value="0" oninput="calculateTotal()" style="padding: 5px;"><br><br> -->
+        <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
+        <input type="number" name="discount" id="discount" step="0.01" value="0" oninput="calculateTotal()" style="padding: 5px;"><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
         <div id="total-amount" style="font-weight: bold; font-size: 18px;">$0.00</div><br><br>
@@ -111,8 +122,7 @@ $legacy_conn->close();
     </form>
 
     <script>
-        function addItem() 
-        {
+        function addItem() {
             const container = document.getElementById("items-container");
             const row = document.createElement("div");
             row.style.display = "flex";
@@ -128,22 +138,20 @@ $legacy_conn->close();
             container.appendChild(row);
         }
 
-        function removeItem(button) 
-        {
+        function removeItem(button) {
             button.parentElement.remove();
             calculateTotal();
         }
 
-        function calculateTotal() 
-        {
+        function calculateTotal() {
             const priceInputs = document.querySelectorAll(".item-price");
             let total = 0;
             priceInputs.forEach(input => {
                 total += parseFloat(input.value) || 0;
             });
 
-            //const discount = parseFloat(document.getElementById("discount").value) || 0;
-            //const discountedTotal = total * (1 - discount / 100);
+            const discount = parseFloat(document.getElementById("discount").value) || 0;
+            const discountedTotal = total * (1 - discount / 100);
             document.getElementById("total-amount").textContent = `$${total.toFixed(2)}`;
         }
 

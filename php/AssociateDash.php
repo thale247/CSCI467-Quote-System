@@ -16,8 +16,7 @@ include('../includes/db_connect_legacy.php');
 $customer_query = "SELECT id, name FROM customers";
 $customer_result = $legacy_conn->query($customer_query);
 
-
-$quote_query = "SELECT quote_id, total_amount, customer_id FROM Quote WHERE created_by LIKE '{$_SESSION['userid']}'";
+$quote_query = "SELECT quote_id, total_amount, customer_name FROM Quote WHERE created_by LIKE '{$_SESSION['userid']}'";
 $quote_result = $conn->query($quote_query);
 ?>
 
@@ -125,9 +124,9 @@ $quote_result = $conn->query($quote_query);
                 alert("Please select a customer first.");
             }
         }
-        function openExistingQuote(cust_id, quote_id) {
-            if(cust_id && quote_id) {
-                window.open("editquote.php?customer_id=" + cust_id + "&quote_id=" + quote_id, "New Quote", "width=600,height=400");
+        function openExistingQuote(quote_id) {
+            if (quote_id) {
+                window.open("editquote.php?quote_id=" + quote_id, "Edit Quote", "width=600,height=400");
             }
         }
     </script>
@@ -157,6 +156,7 @@ $quote_result = $conn->query($quote_query);
         <thead>
             <tr>
                 <th>Quote ID</th>
+                <th>Customer Name</th>
                 <th>Total Amount ($)</th>
                 <th></th>
             </tr>
@@ -166,15 +166,17 @@ $quote_result = $conn->query($quote_query);
             if ($quote_result && $quote_result->num_rows > 0) {
                 while ($quote = $quote_result->fetch_assoc()) {
                     $qid = htmlspecialchars($quote['quote_id']);
+                    $cust_name = htmlspecialchars($quote['customer_name'] ?? '');
+                    $total = htmlspecialchars($quote['total_amount']);
                     echo "<tr>";
-                    echo "<td>" . $qid . "</td>";
-                    echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
-                    $cid = htmlspecialchars($quote['customer_id'], ENT_QUOTES);
-                    echo "<td><button onclick=\"openExistingQuote('$cid', '$qid')\">Edit</button></td>";
+                    echo "<td>$qid</td>";
+                    echo "<td>$cust_name</td>";
+                    echo "<td>$total</td>";
+                    echo "<td><button onclick=\"openExistingQuote('$qid')\">Edit</button></td>";
                     echo "</tr>";
                 }
             } else {
-                echo "<tr><td colspan='2'>No quotes found.</td></tr>";
+                echo "<tr><td colspan='4'>No quotes found.</td></tr>";
             }
             ?>
         </tbody>
