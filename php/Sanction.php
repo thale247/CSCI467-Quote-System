@@ -21,7 +21,7 @@ while ($cust = $customer_result->fetch_assoc()) {
     $customer_names[$cust['id']] = $cust['name'];
 }
 
-$quote_query =  "SELECT quote_id, created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, created, customer_id, status FROM Quote
+$quote_query =  "SELECT quote_id, created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, created, customer_id, asc_name , asc_name_last, status FROM Quote
                     WHERE `status` = 'finalized'";
 $quote_result = $conn->query($quote_query);
 ?>
@@ -172,13 +172,12 @@ $quote_result = $conn->query($quote_query);
                     echo "<tr>";
                     echo "<td>" . $qid . "</td>";
                     echo "<td>" . htmlspecialchars($quote['created']) . "</td>";
-                    echo "<td>" . htmlspecialchars($quote['created_by']) . "</td>";
-
+                    echo "<td>" . htmlspecialchars(($quote['asc_name'] ?? '') . ' ' . ($quote['asc_name_last'] ?? '')) . "</td>";
                     $cust_id = $quote['customer_id'];
                     $cust_name = htmlspecialchars($customer_names[$cust_id] ?? 'Unknown');
                     echo "<td>$cust_name</td>";
 
-                    echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
+                    echo "<td>$" . htmlspecialchars($quote['total_amount']) . "</td>";
 
                     $cid = htmlspecialchars($cust_id, ENT_QUOTES);
                     echo "<td><button onclick=\"openExistingQuote('$cid', '$qid')\">Sanction</button></td>";
