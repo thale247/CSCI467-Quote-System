@@ -8,14 +8,15 @@ if (!isset($_SESSION['userid'])) {
     exit();
 }
 
-// Get the associate's first name based on the session's user ID
+
 $userid = $_SESSION['userid'];
-$assoc_query = "SELECT FIRST FROM Associate WHERE USERID = '$userid'";
+$assoc_query = "SELECT FIRST, commission FROM Associate WHERE USERID = '$userid'";
 $assoc_result = $conn->query($assoc_query);
 
 if ($assoc_result && $assoc_result->num_rows > 0) {
     $associate = $assoc_result->fetch_assoc();
-    $associate_name = $associate['FIRST']; // First name of the associate
+    $associate_name = $associate['FIRST'];
+    $current_commission = $associate['commission'];
 } else {
     die("Associate not found.");
 }
@@ -61,11 +62,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $discounted_total = $total * (1 - $discount / 100);
     $total = number_format($discounted_total, 2, '.', '');
 
+   
     $insert = "INSERT INTO Quote (created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id, customer_name, asc_name)
                VALUES ('{$_SESSION['userid']}', '$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id, '$customer_name', '$associate_name')";
 
     if ($conn->query($insert) === TRUE) {
         echo "<p style='font-weight:bold;'>Quote successfully submitted!</p>";
+
+
+        $commission = $total * 0.20; 
+
+
+        $new_commission = $current_commission + $commission;
+        $update_commission_query = "UPDATE Associate SET commission = '$new_commission' WHERE USERID = '$userid'";
+
+        if ($conn->query($update_commission_query) === TRUE) {
+            echo "<p style='font-weight:bold;'>Associate's commission updated successfully!</p>";
+        } else {
+            echo "<p style='font-weight:bold;'>Error updating commission: " . $conn->error . "</p>";
+        }
+
     } else {
         echo "<p style='font-weight:bold;'>Error: " . $conn->error . "</p>";
     }
