@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $updateStatus->bind_param("s", $quote_id);
         if ($updateStatus->execute()) {
             echo "<p style='font-weight:bold; color: green;'>Quote successfully sanctioned!</p>";
-            header("Location: Sanction.php");
+            //header("Location: Sanction.php");
             exit();
         } else {
             echo "<p style='font-weight:bold; color: red;'>Error: " . $updateStatus->error . "</p>";
