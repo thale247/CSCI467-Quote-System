@@ -148,7 +148,8 @@ $legacy_conn->close();
         <div id="total-amount" style="font-weight: bold; font-size: 18px;"><?php echo number_format($total_amount,2);?></div><br><br>
 
         <input type="submit" value="Update Quote" style="padding: 10px 20px; font-weight: bold;"><br><br>
-        <button type="button" onclick="submit_quote()" style="margin: 10px 0;">Process PO</button>
+        <p>To convert this quote into an order and process it, click here:
+        <button type="button" onclick="submit_quote()" style="margin: 10px 0;">Process PO</button></p>
 
     </form>
 
