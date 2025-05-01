@@ -373,19 +373,6 @@ $legacy_conn->close();
 
         calculateTotal();
 
-
-        window.addEventListener("DOMContentLoaded", () => {
-            for (let i = 0; i < existingItems.length; i++) {
-                if (existingItems[i].trim() !== "") {
-                    addItem();
-                    const row = document.querySelectorAll("#items-container > div")[i];
-                    row.querySelector(".item-name").value = existingItems[i];
-                    row.querySelector(".item-desc").value = existingDescriptions[i] || "";
-                    row.querySelector(".item-price").value = existingPrices[i] || "";
-                } 
-            }
-            calculateTotal();
-        });
     </script>
 </body>
 </html>
