@@ -372,9 +372,10 @@ $legacy_conn->close();
 
         calculateTotal();
 
-        const existingItems = "<?php echo addslashes($items); ?>".split(",");
-        const existingPrices = "<?php echo addslashes($item_prices); ?>".split(",");
-        const existingDescs = "<?php echo addslashes($item_descriptions); ?>".split(",");
+        const existingItems = <?php echo json_encode(explode(",", $items)); ?>;
+        const existingPrices = <?php echo json_encode(explode(",", $item_prices)); ?>;
+        const existingDescs = <?php echo json_encode(explode(",", $item_descriptions)); ?>;
+
 
         window.addEventListener("DOMContentLoaded", () => {
             for (let i = 0; i < existingItems.length; i++) {
