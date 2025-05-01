@@ -45,6 +45,7 @@ if (isset($_GET['quote_id'])) {
     if ($quote_result && $quote_result->num_rows > 0) {
         $quote = $quote_result->fetch_assoc();
         $customer_email = $quote['customer_email'];
+        $email = $quote['customer_email'];
         $created_by = $quote['created_by'];
         $quote_items = $quote['items'];
         $quote_item_prices = $quote['item_prices'];
