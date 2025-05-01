@@ -97,6 +97,20 @@ $quote_result = $conn->query($quote_query);
             background-color: #45a049;
         }
 
+        .view-quotes-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .view-quotes-btn:hover {
+            background-color: #2980b9;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -151,6 +165,9 @@ $quote_result = $conn->query($quote_query);
     <form action="admin.php" method="get" style="display:inline;">
     <button type="submit">Admin data</button>
     </form>
+
+    <button href="QuoteSearch.php" class="view-quotes-btn">Search Quotes</button>
+
 
     <h3>Sanction Quotes:</h3>
     <table border="0">
