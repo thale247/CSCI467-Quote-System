@@ -27,7 +27,7 @@ if (isset($_GET['quote_id'])) {
         $quote = $result->fetch_assoc();
         $quote_email = $quote['customer_email'];
         $quote_notes = $quote['secret_notes'];
-        $quote_discount = $quote['discount_percentage'];
+        $quote_discount_per = $quote['discount_percentage'];
         $quote_price = $quote['total_amount'];
         $quote_items = $quote['items'];
         $quote_item_prices = $quote['item_prices'];
@@ -145,10 +145,9 @@ $legacy_conn->close();
             container.appendChild(row);
         }
 
-        document.getElementById("discount").value = discount.toFixed(2);
         document.getElementById("discount_percent").value = discount_per.toFixed(2);
 
-        calculateTotal();
+        calculateTotalPercent();
     };
 </script>
 
