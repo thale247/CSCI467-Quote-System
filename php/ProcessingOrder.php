@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 if (!isset($_SESSION['userid'])) {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit();
 }
 
