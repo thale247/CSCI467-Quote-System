@@ -79,6 +79,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $total += floatval(trim($price));
         }
 
+        echo $total;
+
         $discounted_total = $total * (1 - $discount / 100);
 
         $url = 'http://blitz.cs.niu.edu/PurchaseOrder/';
