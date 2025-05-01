@@ -313,10 +313,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             form.submit();
         }
 
-        const existingItems = "<?= addslashes($quote['items']) ?>".split(",");
-        const existingPrices = "<?= addslashes($quote['item_prices']) ?>".split(",");
-        const existingDescriptions = "<?= addslashes($quote['item_details']) ?>".split(",");
-
         window.addEventListener("DOMContentLoaded", () => {
             for (let i = 0; i < existingItems.length; i++) {
                 if (existingItems[i].trim() !== "") {
