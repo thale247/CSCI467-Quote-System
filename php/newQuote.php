@@ -94,13 +94,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $updateStatus->close();
     }
 
+    $customer_email = $_POST['email'];
     $quote_items = $_POST['items'];
     $quote_item_prices = $_POST['prices'];
     $quote_item_details = $_POST['descriptions'];
     $quote_discount_per = $_POST['discount_percent'];
-    $quote_discount = $_POST['discount'];
-    $customer_email = $_POST['email']; 
-
     $conn->close();
 }
 
@@ -118,34 +116,41 @@ $legacy_conn->close();
     const existingPrices = <?php echo json_encode(explode(",", $quote_item_prices ?? "")); ?>;
     const existingDescriptions = <?php echo json_encode(explode(",", $quote_item_details ?? "")); ?>;
     const discount_per = <?php echo json_encode($quote_discount_per ?? "0"); ?>;
-    const discount = <?php echo json_encode($quote_discount ?? "0"); ?>;
 
     window.onload = function () {
-        const container = document.getElementById("items-container");
+    const container = document.getElementById("items-container");
 
-        for (let i = 0; i < existingItems.length; i++) {
-            const row = document.createElement("div");
-            row.style.display = "flex";
-            row.style.gap = "10px";
-            row.style.marginBottom = "10px";
-            row.style.alignItems = "center";
+    for (let i = 0; i < existingItems.length; i++) {
+        const row = document.createElement("div");
+        row.style.display = "flex";
+        row.style.gap = "10px";
+        row.style.marginBottom = "10px";
+        row.style.alignItems = "center";
 
-            const desc = existingDescriptions[i] || "";
+        const desc = existingDescriptions[i] || "";
 
-            row.innerHTML = `
-                <input type="text" placeholder="Item Name" class="item-name" required value="${existingItems[i]}" style="padding: 5px;">
-                <input type="text" placeholder="Description" class="item-desc" value="${desc}" style="padding: 5px;">
-                <input type="number" step="0.01" placeholder="Price" class="item-price" required value="${existingPrices[i]}" oninput="calculateTotal()" style="padding: 5px;">
-                <button type="button" onclick="removeItem(this)" style="background-color: black; color: white; border: none; padding: 4px 10px; font-weight: bold; font-size: 16px; cursor: pointer; line-height: 1;">X</button>
-            `;
-            container.appendChild(row);
-        }
+        row.innerHTML = `
+            <input type="text" placeholder="Item Name" class="item-name" required value="${existingItems[i]}" style="padding: 5px;">
+            <input type="text" placeholder="Description" class="item-desc" value="${desc}" style="padding: 5px;">
+            <input type="number" step="0.01" placeholder="Price" class="item-price" required value="${existingPrices[i]}" oninput="calculateTotal()" style="padding: 5px;">
+            <button type="button" onclick="removeItem(this)" style="background-color: black; color: white; border: none; padding: 4px 10px; font-weight: bold; font-size: 16px; cursor: pointer; line-height: 1;">X</button>
+        `;
+        container.appendChild(row);
+    }
 
-        document.getElementById("discount").value = discount.toFixed(2);
-        document.getElementById("discount_percent").value = discount_per.toFixed(2);
+    // Calculate discount $ from percent
+    let total = 0;
+    existingPrices.forEach(p => {
+        total += parseFloat(p) || 0;
+    });
+    const calculatedDiscount = (parseFloat(discount_per) / 100) * total;
 
-        calculateTotal(); 
-    };
+    document.getElementById("discount_percent").value = parseFloat(discount_per).toFixed(2);
+    document.getElementById("discount").value = calculatedDiscount.toFixed(2);
+
+    calculateTotalPercent();
+};
+
 </script>
 <body style="font-family: Arial, sans-serif; padding: 20px;">
     <h2 style="margin-bottom: 10px;">CREATING NEW QUOTE FOR: <?php echo htmlspecialchars($customer_name); ?></h2>
