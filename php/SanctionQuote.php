@@ -54,6 +54,7 @@ $quote_item_details = $quote['item_details'];
 $quote_item_prices = $quote['item_prices'];
 $total_amount = $quote['total_amount'];
 $discount = $quote['discount_percentage'];
+$quote_discount_per = $quote['discount_percentage'];
 $status = $quote['status'];
 $asc_id = $quote['created_by'];
 $secret_notes = $quote['secret_notes'];
