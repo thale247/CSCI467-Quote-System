@@ -35,12 +35,76 @@ $result = $conn->query($query);
 <head>
     <title>Quote Search</title>
     <style>
-        body { font-family: Arial; padding: 20px; background: #f9f9f9; }
-        table { border-collapse: collapse; width: 100%; background: #fff; }
-        th, td { padding: 10px; border: 1px solid #ccc; }
-        th { background: #eee; }
-        input, select { padding: 5px; margin: 5px; }
-        .search-form { margin-bottom: 20px; background: #fff; padding: 20px; border-radius: 8px; }
+        body {
+            background-color: #f4f4f9;
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            margin: 0;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .search-form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .search-form label {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+        }
+
+        .search-form input, .search-form select {
+            margin: 5px 10px 10px 0;
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .search-form input[type="submit"] {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-form input[type="submit"]:hover {
+            background-color: #2980b9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #e8e8e8;
+            color: #333;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
     </style>
 </head>
 <body>
@@ -53,13 +117,19 @@ $result = $conn->query($query);
         <option value="sanctioned" <?= $status == 'sanctioned' ? 'selected' : '' ?>>Sanctioned</option>
         <option value="ordered" <?= $status == 'ordered' ? 'selected' : '' ?>>Ordered</option>
     </select>
-    <label>Date Range:</label>
+
+    <label>Date From:</label>
     <input type="date" name="start_date" value="<?= htmlspecialchars($start_date) ?>">
+
+    <label>To:</label>
     <input type="date" name="end_date" value="<?= htmlspecialchars($end_date) ?>">
+
     <label>Associate:</label>
     <input type="text" name="asc" value="<?= htmlspecialchars($asc) ?>">
+
     <label>Customer:</label>
     <input type="text" name="customer" value="<?= htmlspecialchars($customer) ?>">
+
     <input type="submit" value="Search">
 </form>
 
@@ -87,7 +157,7 @@ $result = $conn->query($query);
                     <td><?= htmlspecialchars($row['asc_name']) . ' ' . htmlspecialchars($row['asc_name_last']) ?></td>
                     <td>$<?= number_format($row['total_amount'], 2) ?></td>
                     <td><?= htmlspecialchars($row['discount_percentage']) ?>%</td>
-                    <td>$<?= number_format($row['commission'], 2) ?></td>
+                    <td>$<?= number_format($row['commission'] ?? 0, 2) ?></td>
                 </tr>
             <?php endwhile; ?>
         <?php else: ?>
