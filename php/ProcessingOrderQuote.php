@@ -54,10 +54,10 @@ if (isset($_GET['quote_id'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (isset($_POST['sanction'])) {
-        $updateStatus = $conn->prepare("UPDATE Quote SET `status` = 'finalized' WHERE quote_id = ?");
+        $updateStatus = $conn->prepare("UPDATE Quote SET `status` = 'ordered' WHERE quote_id = ?");
         $updateStatus->bind_param("s", $quote_id);
         if ($updateStatus->execute()) {
-            echo "<p style='font-weight:bold; color: green;'>Quote successfully finalized!</p>";
+            echo "<p style='font-weight:bold; color: green;'>Quote successfully ordered!</p>";
             //header("Location: ProcessingOrder.php");
             exit();
         } else {
