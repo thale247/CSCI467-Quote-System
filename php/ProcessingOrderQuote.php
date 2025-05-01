@@ -98,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $commission_pct = floatval(str_replace('%', '', $commission_str)) / 100.0;
                 $commission_amount = $discounted_total * $commission_pct;
 
-                $update_commission = $conn->prepare("UPDATE Associate SET commission = commission + ? WHERE USERID = ?");
+                $update_commission = $conn->prepare("UPDATE Associate SET commission = commission + ? WHERE userid = ?");
                 $update_commission->bind_param("ds", $commission_amount, $userid);
                 $update_commission->execute();
                 $update_commission->close();
@@ -180,14 +180,16 @@ $legacy_conn->close();
         </div>
 
         <div id="items-container"></div>
-        <button type="button" onclick="addItem()" style="margin: 10px 0;">+ New Item</button><br>
+        <button type="button" onclick="addItem()"
+        disabled
+        style="margin: 10px 0;">+ New Item</button><br>
 
         <input type="hidden" name="items" id="items-hidden">
         <input type="hidden" name="prices" id="prices-hidden">
         <input type="hidden" name="asc_id" id="asc_id" value="<?php echo htmlspecialchars($created_by);?>">
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Secret Notes:</div>
-        <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;"><?php echo htmlspecialchars($secret_notes);?></textarea><br><br>
+        <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;"readonly><?php echo htmlspecialchars($secret_notes);?></textarea><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
         <input type="number" name="discount" id="discount" step="0.01" value="<?php echo htmlspecialchars($discount); ?>" oninput="calculateTotal()" style="padding: 5px;"><br><br>
@@ -212,7 +214,7 @@ $legacy_conn->close();
             row.innerHTML = `
                 <input type="text" placeholder="Item Name" class="item-name" required style="padding: 5px;">
                 <input type="number" step="0.01" placeholder="Price" class="item-price" oninput="calculateTotal()" required style="padding: 5px;">
-                <button type="button" onclick="removeItem(this)" style="background-color: black; color: white; border: none; padding: 4px 10px; font-weight: bold; font-size: 16px; cursor: pointer; line-height: 1;">X</button>
+                <button type="button" onclick="removeItem(this)" disabled style="background-color: black; color: white; border: none; padding: 4px 10px; font-weight: bold; font-size: 16px; cursor: pointer; line-height: 1;">X</button>
             `;
             container.appendChild(row);
         }
