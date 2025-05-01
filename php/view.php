@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 if (!isset($_SESSION['userid'])) {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit();
 }
 
@@ -113,6 +113,7 @@ $quote_result = $stmt->get_result();
                 <th><a href="?user_id=<?php echo htmlspecialchars($user_id); ?>&sort_column=secret_notes&sort_order=<?php echo ($sort_column == 'secret_notes' && $sort_order == 'asc') ? 'desc' : 'asc'; ?>">Secret Notes</a></th>
                 <th><a href="?user_id=<?php echo htmlspecialchars($user_id); ?>&sort_column=discount_percentage&sort_order=<?php echo ($sort_column == 'discount_percentage' && $sort_order == 'asc') ? 'desc' : 'asc'; ?>">Discount</a></th>
                 <th><a href="?user_id=<?php echo htmlspecialchars($user_id); ?>&sort_column=total_amount&sort_order=<?php echo ($sort_column == 'total_amount' && $sort_order == 'asc') ? 'desc' : 'asc'; ?>">Total Amount</a></th>
+                <th><a href="?user_id=<?php echo htmlspecialchars($user_id); ?>&sort_column=total_amount&sort_order=<?php echo ($sort_column == 'commission' && $sort_order == 'asc') ? 'desc' : 'asc'; ?>">Commission</a></th>
                 <th><a href="?user_id=<?php echo htmlspecialchars($user_id); ?>&sort_column=created&sort_order=<?php echo ($sort_column == 'created' && $sort_order == 'asc') ? 'desc' : 'asc'; ?>">Created</a></th>
                 <th><a href="?user_id=<?php echo htmlspecialchars($user_id); ?>&sort_column=status&sort_order=<?php echo ($sort_column == 'status' && $sort_order == 'asc') ? 'desc' : 'asc'; ?>">Status</a></th>
                 <th><a href="?user_id=<?php echo htmlspecialchars($user_id); ?>&sort_column=process_date&sort_order=<?php echo ($sort_column == 'process_date' && $sort_order == 'asc') ? 'desc' : 'asc'; ?>">Process Date</a></th>
@@ -130,6 +131,7 @@ $quote_result = $stmt->get_result();
                     echo "<td>" . htmlspecialchars($quote['secret_notes']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['discount_percentage']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
+                    echo "<td>" . htmlspecialchars($quote['commission']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['created']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['status']) . "</td>";
                     echo "<td> 

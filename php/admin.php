@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 if (!isset($_SESSION['userid'])) {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit();
 }
 
@@ -211,6 +211,7 @@ $associate_result = $conn->query($associate_query);
     </form>
 
     <a href="ProcessingOrder.php" class="back-btn">Back to Processing Orders</a>
+    <a href="QuoteSearch.php" class="view-quotes-btn">Search Quotes</a>
 
 </body>
 </html>
