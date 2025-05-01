@@ -52,6 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $prices = $conn->real_escape_string($_POST['prices']);
     $notes = $conn->real_escape_string($_POST['notes']);
     $discount = floatval($_POST['discount']);
+    $discount_percent = floatval($_POST['discount_percent']);
 
     // Calculate total and apply discount
     $item_prices = explode(",", $_POST['prices']);
@@ -209,10 +210,12 @@ $legacy_conn->close();
 
             const discount = parseFloat(document.getElementById("discount").value) || 0;
             const discountedTotal = total - discount;
-            document.getElementById("total-amount").textContent = `$${total.toFixed(2)}`;
-            if(total != 0){
-                var per = discount / total;
-                document.getElementById("discount_percent").textContent = per.toFixed(2);
+
+            document.getElementById("total-amount").textContent = `$${discountedTotal.toFixed(2)}`;
+
+            if (total !== 0) {
+                const per = (discount / total) * 100;
+                document.getElementById("discount_percent").value = per.toFixed(2);
             }
         }
 
@@ -222,14 +225,15 @@ $legacy_conn->close();
             priceInputs.forEach(input => {
                 total += parseFloat(input.value) || 0;
             });
-            if (total != 0){
-                const discount = parseFloat(document.getElementById("discount_percent").value) || 0;
-                const discountedTotal = total * (1 - discount / 100);
-                document.getElementById("total-amount").textContent = `$${total.toFixed(2)}`;
-                var dis = (discount / 100) * total;
-                document.getElementById("discount").textContent = dis.toFixed(2);
-            }
+
+            const percent = parseFloat(document.getElementById("discount_percent").value) || 0;
+            const discount = (percent / 100) * total;
+            const discountedTotal = total - discount;
+
+            document.getElementById("discount").value = discount.toFixed(2);
+            document.getElementById("total-amount").textContent = `$${discountedTotal.toFixed(2)}`;
         }
+
 
         function prepare() {
             const itemNames = [];
