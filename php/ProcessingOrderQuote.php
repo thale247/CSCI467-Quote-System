@@ -42,6 +42,7 @@ if (isset($_GET['quote_id'])) {
         $created_by = $quote['created_by'];
         $items = $quote['items'];
         $item_prices = $quote['item_prices'];
+        $item_descriptions = $quote['item_details'];
         $secret_notes = $quote['secret_notes'];
         $total_amount = $quote['total_amount'];
         $status = $quote['status'];
@@ -60,6 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $cust_id = $conn->real_escape_string($_POST['customer_id']);
         $items = $conn->real_escape_string($_POST['items']);
         $prices = $conn->real_escape_string($_POST['prices']);
+        $descriptions = $conn->real_escape_string($_POST['descriptions']);
         $discount = floatval($_POST['discount']);
 
         $item_prices_array = explode(",", $_POST['prices']);
@@ -94,30 +96,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             $response = json_decode($result, true);
             if (isset($response['commission'])) {
-                $commission_str = $response['commission']; // e.g., "8%"
+                $commission_str = $response['commission'];
                 $commission_pct = floatval(str_replace('%', '', $commission_str)) / 100.0;
                 $commission_amount = $discounted_total * $commission_pct;
+
+                $update_quote = $conn->prepare("UPDATE Quote SET commission = ?, status = 'ordered' WHERE quote_id = ?");
+                $update_quote->bind_param("ds", $commission_amount, $quote_id);
+                $update_quote->execute();
+                $update_quote->close();
 
                 $update_commission = $conn->prepare("UPDATE Associate SET commission = commission + ? WHERE USERID = ?");
                 $update_commission->execute([$commission_amount, $_POST['asc_id']]);
                 $update_commission->close();
-            }
 
-            $updateStatus = $conn->prepare("UPDATE Quote SET `status` = 'ordered' WHERE quote_id = ?");
-            $updateStatus->bind_param("s", $quote_id);
-            if ($updateStatus->execute()) {
-                echo "<p style='font-weight:bold; color: green;'>Quote successfully ordered!</p>";
+                $message = "Dear $customer_name,\n\nYour order has been successfully placed.\n\nQuote ID: $quote_id\n";
+                $item_array = explode(",", $items);
+                $desc_array = explode(",", $item_descriptions);
+                $price_array = explode(",", $item_prices);
+
+                $message .= "\nOrder Details:\n";
+                for ($i = 0; $i < count($item_array); $i++) {
+                    $item = $item_array[$i] ?? '';
+                    $desc = $desc_array[$i] ?? '';
+                    $price = $price_array[$i] ?? '';
+                    $message .= "- $item ($desc): \$$price\n";
+                }
+
+                $message .= "\nDiscount Applied: $discount%\n";
+                $message .= "Total Charged: $" . number_format($discounted_total, 2) . "\n\nThank you for your business!";
+
+                mail($customer_email, "Your Order Confirmation", $message, "From: noreply@quote-system.com");
+
+                echo "<p style='font-weight:bold; color: green;'>Quote successfully ordered and email sent!</p>";
                 exit();
             } else {
-                echo "<p style='font-weight:bold; color: red;'>Error: " . $updateStatus->error . "</p>";
+                echo "<p style='color: red;'>Missing commission in response.</p>";
             }
-            $updateStatus->close();
         }
     } else {
         $cust_id = $conn->real_escape_string($_POST['customer_id']);
         $email = $conn->real_escape_string($_POST['email']);
         $items = $conn->real_escape_string($_POST['items']);
         $prices = $conn->real_escape_string($_POST['prices']);
+        $descriptions = $conn->real_escape_string($_POST['descriptions']);
         $notes = $conn->real_escape_string($_POST['notes']);
         $discount = floatval($_POST['discount']);
 
@@ -130,7 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $discounted_total = $total * (1 - $discount / 100);
         $total = number_format($discounted_total, 2, '.', '');
 
-        $update = "UPDATE Quote SET customer_email = '$email', items = '$items', item_prices = '$prices',
+        $update = "UPDATE Quote SET customer_email = '$email', items = '$items', item_prices = '$prices', item_details = '$descriptions',
                     secret_notes = '$notes', discount_percentage = '$discount', total_amount = '$total',
                     customer_id = $cust_id
                     WHERE quote_id = '$quote_id'";
@@ -175,26 +196,26 @@ $legacy_conn->close();
 
         <div style="display: flex; gap: 10px; font-weight: bold; margin-bottom: 5px;">
             <div style="width: 150px;">Item Name</div>
-            <div style="width: 150px;">Price ($)</div>
+            <div style="width: 200px;">Description</div>
+            <div style="width: 100px;">Price ($)</div>
         </div>
 
         <div id="items-container"></div>
-        <button type="button" onclick="addItem()"
-        disabled
-        style="margin: 10px 0;">+ New Item</button><br>
+        <button type="button" onclick="addItem()" disabled style="margin: 10px 0;">+ New Item</button><br>
 
         <input type="hidden" name="items" id="items-hidden">
         <input type="hidden" name="prices" id="prices-hidden">
+        <input type="hidden" name="descriptions" id="descriptions-hidden">
         <input type="hidden" name="asc_id" id="asc_id" value="<?php echo htmlspecialchars($created_by);?>">
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Secret Notes:</div>
-        <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;"readonly><?php echo htmlspecialchars($secret_notes);?></textarea><br><br>
+        <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;" readonly><?php echo htmlspecialchars($secret_notes);?></textarea><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
         <input type="number" name="discount" id="discount" step="0.01" value="<?php echo htmlspecialchars($discount); ?>" oninput="calculateTotal()" style="padding: 5px;"><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
-        <div id="total-amount" style="font-weight: bold; font-size: 18px;"><?php echo number_format($total_amount,2);?></div><br><br>
+        <div id="total-amount" style="font-weight: bold; font-size: 18px;">$<?php echo number_format($total_amount,2);?></div><br><br>
 
         <input type="submit" value="Update Quote" style="padding: 10px 20px; font-weight: bold;"><br><br>
         <p>To convert this quote into an order and process it, click here:
@@ -211,8 +232,9 @@ $legacy_conn->close();
             row.style.alignItems = "center";
 
             row.innerHTML = `
-                <input type="text" placeholder="Item Name" class="item-name" required style="padding: 5px;">
-                <input type="number" step="0.01" placeholder="Price" class="item-price" oninput="calculateTotal()" required style="padding: 5px;">
+                <input type="text" placeholder="Item Name" class="item-name" readonly style="padding: 5px;">
+                <input type="text" placeholder="Description" class="item-desc" readonly style="padding: 5px;">
+                <input type="number" step="0.01" placeholder="Price" class="item-price" readonly oninput="calculateTotal()" style="padding: 5px;">
                 <button type="button" onclick="removeItem(this)" disabled style="background-color: black; color: white; border: none; padding: 4px 10px; font-weight: bold; font-size: 16px; cursor: pointer; line-height: 1;">X</button>
             `;
             container.appendChild(row);
@@ -238,18 +260,22 @@ $legacy_conn->close();
         function prepare() {
             const itemNames = [];
             const itemPrices = [];
+            const itemDescs = [];
 
             document.querySelectorAll("#items-container > div").forEach(row => {
                 const name = row.querySelector(".item-name").value.trim();
+                const desc = row.querySelector(".item-desc").value.trim();
                 const price = row.querySelector(".item-price").value.trim();
                 if (name !== "" && price !== "") {
                     itemNames.push(name);
                     itemPrices.push(price);
+                    itemDescs.push(desc);
                 }
             });
 
             document.getElementById("items-hidden").value = itemNames.join(",");
             document.getElementById("prices-hidden").value = itemPrices.join(",");
+            document.getElementById("descriptions-hidden").value = itemDescs.join(",");
 
             calculateTotal();
             return true;
@@ -270,6 +296,7 @@ $legacy_conn->close();
 
         const existingItems = "<?php echo addslashes($items); ?>".split(",");
         const existingPrices = "<?php echo addslashes($item_prices); ?>".split(",");
+        const existingDescs = "<?php echo addslashes($item_descriptions); ?>".split(",");
 
         window.addEventListener("DOMContentLoaded", () => {
             for (let i = 0; i < existingItems.length; i++) {
@@ -277,6 +304,7 @@ $legacy_conn->close();
                     addItem();
                     const row = document.querySelectorAll("#items-container > div")[i];
                     row.querySelector(".item-name").value = existingItems[i];
+                    row.querySelector(".item-desc").value = existingDescs[i] || "";
                     row.querySelector(".item-price").value = existingPrices[i] || "";
                 }
             }

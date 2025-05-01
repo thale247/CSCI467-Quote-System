@@ -19,7 +19,6 @@ if (!isset($_GET['customer_id']) || !isset($_GET['quote_id'])) {
 $customer_id = $_GET['customer_id'];
 $quote_id = $_GET['quote_id'];
 
-// Fetch customer info from legacy DB
 $customer_stmt = $legacy_conn->prepare("SELECT name, city, street, contact FROM customers WHERE id = ?");
 $customer_stmt->bind_param("s", $customer_id);
 $customer_stmt->execute();
@@ -34,7 +33,6 @@ $customer_street = $customer['street'];
 $customer_contact = $customer['contact'];
 $customer_stmt->close();
 
-// Fetch quote info
 $quote_stmt = $conn->prepare("SELECT * FROM Quote WHERE quote_id = ?");
 $quote_stmt->bind_param("s", $quote_id);
 $quote_stmt->execute();
@@ -46,19 +44,21 @@ $quote = $quote_result->fetch_assoc();
 $quote_stmt->close();
 
 $customer_email = $quote['customer_email'];
-$items = $quote['items'];
-$item_prices = $quote['item_prices'];
-$secret_notes = $quote['secret_notes'];
+$items = explode(",", $quote['items']);
+$item_prices = explode(",", $quote['item_prices']);
+$item_descriptions = explode(",", $quote['item_details']);
 $total_amount = $quote['total_amount'];
 $discount = $quote['discount_percentage'];
 $status = $quote['status'];
 $asc_id = $quote['created_by'];
+$secret_notes = $quote['secret_notes'];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $cust_id = $conn->real_escape_string($_POST['customer_id']);
     $email = $conn->real_escape_string($_POST['email']);
     $items = $conn->real_escape_string($_POST['items']);
     $prices = $conn->real_escape_string($_POST['prices']);
+    $descriptions = $conn->real_escape_string($_POST['descriptions']);
     $notes = isset($_POST['notes']) ? $conn->real_escape_string($_POST['notes']) : '';
     $discount = floatval($_POST['discount']);
 
@@ -72,12 +72,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $formatted_total = number_format($discounted_total, 2, '.', '');
 
     if (isset($_POST['sanction'])) {
-
-        // Update quote status
         $update_stmt = $conn->prepare("UPDATE Quote SET status = 'sanctioned' WHERE quote_id = ?");
         $update_stmt->bind_param("s", $quote_id);
         if ($update_stmt->execute()) {
-            echo "<p style='font-weight:bold; color: green;'>Quote successfully sanctioned!</p>";
+            $message = "Dear $customer_name,\n\nHere is the finalized quote for your request:\n\n";
+            $message .= "Itemized List:\n";
+            for ($i = 0; $i < count($items); $i++) {
+                $name = $items[$i] ?? '';
+                $desc = $item_descriptions[$i] ?? '';
+                $price = $item_prices[$i] ?? '';
+                $message .= "- $name ($desc): \$$price\n";
+            }
+            $message .= "\nDiscount Applied: $discount%\n";
+            $message .= "Total Due: \$$total_amount\n\nThank you for your business!";
+
+            mail($customer_email, "Your Sanctioned Quote", $message, "From: noreply@quote-system.com");
+            echo "<p style='font-weight:bold; color: green;'>Quote sanctioned and email sent!</p>";
             $update_stmt->close();
             $conn->close();
             $legacy_conn->close();
@@ -87,8 +97,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $update_stmt->close();
         }
     } else {
-        $update = $conn->prepare("UPDATE Quote SET customer_email = ?, items = ?, item_prices = ?, secret_notes = ?, discount_percentage = ?, total_amount = ?, customer_id = ? WHERE quote_id = ?");
-        $update->bind_param("ssssdsis", $email, $items, $prices, $notes, $discount, $formatted_total, $cust_id, $quote_id);
+        $update = $conn->prepare("UPDATE Quote SET customer_email = ?, items = ?, item_prices = ?, item_details = ?, secret_notes = ?, discount_percentage = ?, total_amount = ?, customer_id = ? WHERE quote_id = ?");
+        $update->bind_param("ssssdsiss", $email, $items, $prices, $descriptions, $notes, $discount, $formatted_total, $cust_id, $quote_id);
 
         if ($update->execute()) {
             echo "<p style='font-weight:bold;'>Quote successfully updated!</p>";
@@ -126,13 +136,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <h3>Items</h3>
         <div style="display: flex; gap: 10px; font-weight: bold; margin-bottom: 5px;">
             <div style="width: 150px;">Item Name</div>
-            <div style="width: 150px;">Price ($)</div>
+            <div style="width: 200px;">Description</div>
+            <div style="width: 100px;">Price ($)</div>
         </div>
         <div id="items-container"></div>
         <button type="button" onclick="addItem()" style="margin: 10px 0;">+ New Item</button><br>
 
         <input type="hidden" name="items" id="items-hidden">
         <input type="hidden" name="prices" id="prices-hidden">
+        <input type="hidden" name="descriptions" id="descriptions-hidden">
         <input type="hidden" name="asc_id" id="asc_id" value="<?= htmlspecialchars($asc_id) ?>">
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Secret Notes:</div>
@@ -142,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <input type="number" name="discount" id="discount" step="0.01" value="<?= htmlspecialchars($discount) ?>" oninput="calculateTotal()" style="padding: 5px;"><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
-        <div id="total-amount" style="font-weight: bold; font-size: 18px;"><?= number_format($total_amount, 2) ?></div><br><br>
+        <div id="total-amount" style="font-weight: bold; font-size: 18px;">$<?= number_format($total_amount, 2) ?></div><br><br>
 
         <input type="submit" value="Update Quote" style="padding: 10px 20px; font-weight: bold;"><br><br>
 
@@ -161,6 +173,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             row.innerHTML = `
                 <input type="text" placeholder="Item Name" class="item-name" required style="padding: 5px;">
+                <input type="text" placeholder="Description" class="item-desc" style="padding: 5px;">
                 <input type="number" step="0.01" placeholder="Price" class="item-price" oninput="calculateTotal()" required style="padding: 5px;">
                 <button type="button" onclick="removeItem(this)" style="background-color: black; color: white; border: none; padding: 4px 10px; font-weight: bold; font-size: 16px; cursor: pointer; line-height: 1;">X</button>
             `;
@@ -187,22 +200,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         function prepare() {
             const itemNames = [];
             const itemPrices = [];
+            const itemDescs = [];
+
             document.querySelectorAll("#items-container > div").forEach(row => {
                 const name = row.querySelector(".item-name").value.trim();
+                const desc = row.querySelector(".item-desc").value.trim();
                 const price = row.querySelector(".item-price").value.trim();
                 if (name && price) {
                     itemNames.push(name);
                     itemPrices.push(price);
+                    itemDescs.push(desc);
                 }
             });
 
             document.getElementById("items-hidden").value = itemNames.join(",");
             document.getElementById("prices-hidden").value = itemPrices.join(",");
+            document.getElementById("descriptions-hidden").value = itemDescs.join(",");
             calculateTotal();
             return true;
         }
 
         function submit_quote() {
+            prepare();
             const form = document.querySelector('form');
             const hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
@@ -212,9 +231,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             form.submit();
         }
 
-        // Load existing items
-        const existingItems = "<?= addslashes($items) ?>".split(",");
-        const existingPrices = "<?= addslashes($item_prices) ?>".split(",");
+        const existingItems = "<?= addslashes($quote['items']) ?>".split(",");
+        const existingPrices = "<?= addslashes($quote['item_prices']) ?>".split(",");
+        const existingDescriptions = "<?= addslashes($quote['item_details']) ?>".split(",");
 
         window.addEventListener("DOMContentLoaded", () => {
             for (let i = 0; i < existingItems.length; i++) {
@@ -222,6 +241,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     addItem();
                     const row = document.querySelectorAll("#items-container > div")[i];
                     row.querySelector(".item-name").value = existingItems[i];
+                    row.querySelector(".item-desc").value = existingDescriptions[i] || "";
                     row.querySelector(".item-price").value = existingPrices[i] || "";
                 }
             }
