@@ -11,6 +11,7 @@ if (!isset($_SESSION['userid'])) {
 $userid = $_SESSION['userid'];
 $assoc_query = "SELECT `FIRST`, `LAST`, commission FROM Associate WHERE USERID = '$userid'";
 $assoc_result = $conn->query($assoc_query);
+$customer_email = '';
 
 if ($assoc_result && $assoc_result->num_rows > 0) {
     $associate = $assoc_result->fetch_assoc();
@@ -98,6 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $quote_item_details = $_POST['descriptions'];
     $quote_discount_per = $_POST['discount_percent'];
     $quote_discount = $_POST['discount'];
+    $customer_email = $_POST['email']; 
 
     $conn->close();
 }
@@ -155,7 +157,7 @@ $legacy_conn->close();
         <input type="hidden" name="customer_id" value="<?php echo htmlspecialchars($customer_id); ?>">
 
         <label for="email">Customer Email:</label><br>
-        <input type="email" name="email" id="email" required style="margin-bottom: 15px; padding: 5px;"><br>
+        <input type="email" name="email" id="email" value="<?= htmlspecialchars($customer_email) ?>" required style="margin-bottom: 15px; padding: 5px;"><br>
 
         <h3>Items</h3>
 

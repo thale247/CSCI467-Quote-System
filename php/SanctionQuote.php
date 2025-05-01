@@ -6,6 +6,8 @@ if (!isset($_SESSION['userid'])) {
     header("Location: ../index.php");
     exit();
 }
+$customer_email = '';
+
 
 $legacy_conn = new mysqli('blitz.cs.niu.edu', 'student', 'student', 'csci467', 3306);
 if ($legacy_conn->connect_error) {
@@ -61,6 +63,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $descriptions = $conn->real_escape_string($_POST['descriptions']);
     $notes = isset($_POST['notes']) ? $conn->real_escape_string($_POST['notes']) : '';
     $discount = floatval($_POST['discount']);
+    $discount_percent = floatval($_POST['discount_percent']);
+
 
     $item_prices_array = explode(",", $_POST['prices']);
     $items = explode(",", $items);
@@ -69,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $total += floatval(trim($price));
     }
 
-    $discounted_total = $total * (1 - $discount / 100);
+    $discounted_total = $total * (1 - $discount_percent / 100);
     $formatted_total = number_format($discounted_total, 2, '.', '');
 
     if (isset($_POST['sanction'])) {
@@ -99,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     } else {
         $update = $conn->prepare("UPDATE Quote SET customer_email = ?, items = ?, item_prices = ?, item_details = ?, secret_notes = ?, discount_percentage = ?, total_amount = ?, customer_id = ? WHERE quote_id = ?");
-        $update->bind_param("ssssdsiss", $email, $items, $prices, $descriptions, $notes, $discount, $formatted_total, $cust_id, $quote_id);
+        $update->bind_param("ssssdsiss", $email, $items, $prices, $descriptions, $notes, $discount_percent, $formatted_total, $cust_id, $quote_id);
 
         if ($update->execute()) {
             echo "<p style='font-weight:bold;'>Quote successfully updated!</p>";
@@ -108,7 +112,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         $update->close();
+
     }
+
+
+    $customer_email = $_POST['email'];
+    $quote_items = $_POST['items'];
+    $quote_item_prices = $_POST['prices'];
+    $quote_item_descriptions = $_POST['descriptions'];
+    $quote_discount = $_POST['discount'];
 
     $conn->close();
     $legacy_conn->close();
@@ -120,6 +132,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <title>Sanction Quote</title>
 </head>
+<script>
+    const existingItems = <?php echo json_encode(explode(",", $quote_items)); ?>;
+    const existingPrices = <?php echo json_encode(explode(",", $quote_item_prices)); ?>;
+    const existingDescriptions = <?php echo json_encode(explode(",", $quote_item_descriptions)); ?>;
+    const discount = <?php echo json_encode($quote_discount); ?>;
+
+    window.onload = function () {
+        const container = document.getElementById("items-container");
+
+        for (let i = 0; i < existingItems.length; i++) {
+            const row = document.createElement("div");
+            row.style.display = "flex";
+            row.style.gap = "10px";
+            row.style.marginBottom = "10px";
+            row.style.alignItems = "center";
+
+            const desc = existingDescriptions[i] || "";
+
+            row.innerHTML = `
+                <input type="text" placeholder="Item Name" class="item-name" required value="${existingItems[i]}" style="padding: 5px;">
+                <input type="text" placeholder="Description" class="item-desc" value="${desc}" style="padding: 5px;">
+                <input type="number" step="0.01" placeholder="Price" class="item-price" required value="${existingPrices[i]}" oninput="calculateTotal()" style="padding: 5px;">
+                <button type="button" onclick="removeItem(this)" style="background-color: black; color: white; border: none; padding: 4px 10px; font-weight: bold; font-size: 16px; cursor: pointer; line-height: 1;">X</button>
+            `;
+            container.appendChild(row);
+        }
+
+        calculateTotal();
+    };
+</script>
 <body style="font-family: Arial, sans-serif; padding: 20px;">
     <h2 style="margin-bottom: 10px;">Order From: <?= htmlspecialchars($customer_name) ?></h2>
     <div style="line-height: 1.2; margin-bottom: 20px;">
@@ -132,7 +174,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <form method="post" onsubmit="return prepare();">
         <input type="hidden" name="customer_id" value="<?= htmlspecialchars($customer_id) ?>">
-        <input type="email" name="email" value="<?= htmlspecialchars($customer_email) ?>" readonly style="margin-bottom: 15px; padding: 5px; background-color: #eee; border: 1px solid #ccc;">
+        <input type="email" name="email" value="<?= htmlspecialchars($customer_email) ?>" style="margin-bottom: 15px; padding: 5px; background-color: #eee; border: 1px solid #ccc;">
 
         <h3>Items</h3>
         <div style="display: flex; gap: 10px; font-weight: bold; margin-bottom: 5px;">
@@ -152,7 +194,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;"><?= htmlspecialchars($secret_notes) ?></textarea><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
-        <input type="number" name="discount" id="discount" step="0.01" value="<?= htmlspecialchars($discount) ?>" oninput="calculateTotal()" style="padding: 5px;"><br><br>
+        <input type="number" name="discount_percent" id="discount_percent" step="0.01" value="0" oninput="calculateTotalPercent()" style="padding: 5px;"><br><br>
+        <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount ($):</div>
+        <input type="number" name="discount" id="discount" step="0.01" value="0" oninput="calculateTotal()" style="padding: 5px;"><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
         <div id="total-amount" style="font-weight: bold; font-size: 18px;">$<?= number_format($total_amount, 2) ?></div><br><br>
@@ -160,7 +204,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <input type="submit" value="Update Quote" style="padding: 10px 20px; font-weight: bold;"><br><br>
 
         <p>To sanction this quote and email it to the customer, click here:
-        <button type="button" onclick="submit_quote()" style="margin: 10px 0;">Sanction Quote</button></p>
+        <button type="button" onclick="submit_quote()" style="padding: 10px 20px; font-weight: bold;">Sanction Quote</button></p>
     </form>
 
     <script>
@@ -194,7 +238,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             });
 
             const discount = parseFloat(document.getElementById("discount").value) || 0;
-            const discountedTotal = total * (1 - discount / 100);
+            const discountedTotal = total - discount;
+
+            document.getElementById("total-amount").textContent = `$${discountedTotal.toFixed(2)}`;
+
+            if (total !== 0) {
+                const per = (discount / total) * 100;
+                document.getElementById("discount_percent").value = per.toFixed(2);
+            }
+        }
+
+        function calculateTotalPercent() {
+            const priceInputs = document.querySelectorAll(".item-price");
+            let total = 0;
+            priceInputs.forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+
+            const percent = parseFloat(document.getElementById("discount_percent").value) || 0;
+            const discount = (percent / 100) * total;
+            const discountedTotal = total - discount;
+
+            document.getElementById("discount").value = discount.toFixed(2);
             document.getElementById("total-amount").textContent = `$${discountedTotal.toFixed(2)}`;
         }
 

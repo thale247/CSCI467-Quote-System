@@ -7,6 +7,8 @@ if (!isset($_SESSION['userid'])) {
     header("Location: ../index.php");
     exit();
 }
+$customer_email = '';
+
 
 $legacy_conn = new mysqli('blitz.cs.niu.edu', 'student', 'student', 'csci467', 3306);
 if ($legacy_conn->connect_error) {
@@ -63,6 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $prices = $conn->real_escape_string($_POST['prices']);
         $descriptions = $conn->real_escape_string($_POST['descriptions']);
         $discount = floatval($_POST['discount']);
+        
 
         $item_prices_array = explode(",", $_POST['prices']);
         $total = 0;
@@ -141,6 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $descriptions = $conn->real_escape_string($_POST['descriptions']);
         $notes = $conn->real_escape_string($_POST['notes']);
         $discount = floatval($_POST['discount']);
+        $discount_percent = floatval($_POST['discount_percent']);
 
         $item_prices = explode(",", $_POST['prices']);
         $total = 0;
@@ -148,11 +152,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $total += floatval(trim($price));
         }
 
-        $discounted_total = $total * (1 - $discount / 100);
+        $discounted_total = $total * (1 - $discount_percent / 100);
         $total = number_format($discounted_total, 2, '.', '');
 
         $update = "UPDATE Quote SET customer_email = '$email', items = '$items', item_prices = '$prices', item_details = '$descriptions',
-                    secret_notes = '$notes', discount_percentage = '$discount', total_amount = '$total',
+                    secret_notes = '$notes', discount_percentage = '$discount_percent', total_amount = '$total',
                     customer_id = $cust_id
                     WHERE quote_id = '$quote_id'";
 
@@ -162,7 +166,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "<p style='font-weight:bold;'>Error: " . $conn->error . "</p>";
         }
     }
-
+    $customer_email = $_POST['email'];
+    $quote_items = $_POST['items'];
+    $quote_item_prices = $_POST['prices'];
+    $quote_item_descriptions = $_POST['descriptions'];
+    $quote_discount = $_POST['discount'];
     $conn->close();
 }
 
@@ -175,6 +183,36 @@ $legacy_conn->close();
 <head>
     <title>Process Quote</title>
 </head>
+<script>
+    const existingItems = <?php echo json_encode(explode(",", $quote_items)); ?>;
+    const existingPrices = <?php echo json_encode(explode(",", $quote_item_prices)); ?>;
+    const existingDescriptions = <?php echo json_encode(explode(",", $quote_item_descriptions)); ?>;
+    const discount = <?php echo json_encode($quote_discount); ?>;
+
+    window.onload = function () {
+        const container = document.getElementById("items-container");
+
+        for (let i = 0; i < existingItems.length; i++) {
+            const row = document.createElement("div");
+            row.style.display = "flex";
+            row.style.gap = "10px";
+            row.style.marginBottom = "10px";
+            row.style.alignItems = "center";
+
+            const desc = existingDescriptions[i] || "";
+
+            row.innerHTML = `
+                <input type="text" placeholder="Item Name" class="item-name" readonly value="${existingItems[i]}" style="padding: 5px;">
+                <input type="text" placeholder="Description" class="item-desc" readonly value="${desc}" style="padding: 5px;">
+                <input type="number" step="0.01" placeholder="Price" class="item-price" readonly value="${existingPrices[i]}" oninput="calculateTotal()" style="padding: 5px;">
+                <button type="button" onclick="removeItem(this)" disabled style="background-color: black; color: white; border: none; padding: 4px 10px; font-weight: bold; font-size: 16px; cursor: pointer; line-height: 1;">X</button>
+            `;
+            container.appendChild(row);
+        }
+
+        calculateTotal();
+    };
+</script>
 <body style="font-family: Arial, sans-serif; padding: 20px;">
     <h2 style="margin-bottom: 10px;">Order From: <?php echo htmlspecialchars($customer_name); ?></h2>
 
@@ -201,7 +239,7 @@ $legacy_conn->close();
         </div>
 
         <div id="items-container"></div>
-        <button type="button" onclick="addItem()" disabled style="margin: 10px 0;">+ New Item</button><br>
+        <button type="button" disabled style="margin: 10px 0;">+ New Item</button><br>
 
         <input type="hidden" name="items" id="items-hidden">
         <input type="hidden" name="prices" id="prices-hidden">
@@ -212,14 +250,16 @@ $legacy_conn->close();
         <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;" readonly><?php echo htmlspecialchars($secret_notes);?></textarea><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
-        <input type="number" name="discount" id="discount" step="0.01" value="<?php echo htmlspecialchars($discount); ?>" oninput="calculateTotal()" style="padding: 5px;"><br><br>
+        <input type="number" name="discount_percent" id="discount_percent" step="0.01" value="0" oninput="calculateTotalPercent()" style="padding: 5px;"><br><br>
+        <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount ($):</div>
+        <input type="number" name="discount" id="discount" step="0.01" value="0" oninput="calculateTotal()" style="padding: 5px;"><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
         <div id="total-amount" style="font-weight: bold; font-size: 18px;">$<?php echo number_format($total_amount,2);?></div><br><br>
 
         <input type="submit" value="Update Quote" style="padding: 10px 20px; font-weight: bold;"><br><br>
         <p>To convert this quote into an order and process it, click here:
-        <button type="button" onclick="submit_quote()" style="margin: 10px 0;">Process PO</button></p>
+        <button type="button" onclick="submit_quote()" style="padding: 10px 20px; font-weight: bold;">Process PO</button></p>
     </form>
 
     <script>
@@ -253,7 +293,28 @@ $legacy_conn->close();
             });
 
             const discount = parseFloat(document.getElementById("discount").value) || 0;
-            const discountedTotal = total * (1 - discount / 100);
+            const discountedTotal = total - discount;
+
+            document.getElementById("total-amount").textContent = `$${discountedTotal.toFixed(2)}`;
+
+            if (total !== 0) {
+                const per = (discount / total) * 100;
+                document.getElementById("discount_percent").value = per.toFixed(2);
+            }
+        }
+
+        function calculateTotalPercent() {
+            const priceInputs = document.querySelectorAll(".item-price");
+            let total = 0;
+            priceInputs.forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+
+            const percent = parseFloat(document.getElementById("discount_percent").value) || 0;
+            const discount = (percent / 100) * total;
+            const discountedTotal = total - discount;
+
+            document.getElementById("discount").value = discount.toFixed(2);
             document.getElementById("total-amount").textContent = `$${discountedTotal.toFixed(2)}`;
         }
 

@@ -8,6 +8,8 @@ if (!isset($_SESSION['userid'])) {
     exit();
 }
 
+$quote_email = '';
+
 $legacy_conn = new mysqli('blitz.cs.niu.edu', 'student', 'student', 'csci467', 3306);
 if ($legacy_conn->connect_error) {
     die("Connection to legacy DB failed: " . $legacy_conn->connect_error);
@@ -71,7 +73,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $prices = $conn->real_escape_string($_POST['prices']);
         $descriptions = $conn->real_escape_string($_POST['descriptions']);
         $notes = $conn->real_escape_string($_POST['notes']);
-        $discount_percent = floatval($_POST['discount']);
+        $discount = floatval($_POST['discount']);
+        $discount_percent = floatval($_POST['discount_percent']);
+
 
         $item_prices = explode(",", $_POST['prices']);
         $total = 0;
@@ -98,6 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $quote_item_prices = $_POST['prices'];
     $quote_item_descriptions = $_POST['descriptions'];
     $quote_discount = $_POST['discount'];
+    $quote_email = $_POST['email'];
 
     $conn->close();
 }
@@ -176,7 +181,9 @@ $legacy_conn->close();
         <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;"><?php echo htmlspecialchars($quote_notes); ?></textarea><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
-        <input type="number" name="discount" id="discount" step="0.01" value="<?php echo htmlspecialchars($quote_discount); ?>" oninput="calculateTotal()" style="padding: 5px;"><br><br>
+        <input type="number" name="discount_percent" id="discount_percent" step="0.01" value="0" oninput="calculateTotalPercent()" style="padding: 5px;"><br><br>
+        <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount ($):</div>
+        <input type="number" name="discount" id="discount" step="0.01" value="0" oninput="calculateTotal()" style="padding: 5px;"><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
         <div id="total-amount" style="font-weight: bold; font-size: 18px;">$0.00</div><br><br>
@@ -216,7 +223,28 @@ $legacy_conn->close();
             });
 
             const discount = parseFloat(document.getElementById("discount").value) || 0;
-            const discountedTotal = total * (1 - discount / 100);
+            const discountedTotal = total - discount;
+
+            document.getElementById("total-amount").textContent = `$${discountedTotal.toFixed(2)}`;
+
+            if (total !== 0) {
+                const per = (discount / total) * 100;
+                document.getElementById("discount_percent").value = per.toFixed(2);
+            }
+        }
+
+        function calculateTotalPercent() {
+            const priceInputs = document.querySelectorAll(".item-price");
+            let total = 0;
+            priceInputs.forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+
+            const percent = parseFloat(document.getElementById("discount_percent").value) || 0;
+            const discount = (percent / 100) * total;
+            const discountedTotal = total - discount;
+
+            document.getElementById("discount").value = discount.toFixed(2);
             document.getElementById("total-amount").textContent = `$${discountedTotal.toFixed(2)}`;
         }
 
