@@ -69,6 +69,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $discounted_total = $total * (1 - $discount / 100);
 
+        echo $discounted_total;
+
         $url = 'http://blitz.cs.niu.edu/PurchaseOrder/';
         $data = array(
             'order' => $quote_id,

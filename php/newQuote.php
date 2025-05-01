@@ -67,21 +67,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $insert = "INSERT INTO Quote (created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id, customer_name, asc_name, asc_name_last, `status`)
                VALUES ('{$_SESSION['userid']}', '$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id, '$customer_name', '$associate_name','$associate_name_last', 'unresolved')";
 
-    if ($conn->query($insert) === TRUE) {
+    if (isset($_POST['submit_quote'])) {
+        $updateStatus = $conn->prepare("UPDATE Quote SET `status` = 'finalized' WHERE quote_id = ?");
+        $updateStatus->bind_param("s", $quote_id);
+        if ($updateStatus->execute()) {
+            echo "<p style='font-weight:bold; color: green;'>Quote successfully submitted!</p>";
+            //header("Location: Sanction.php");
+            exit();
+        } else {
+            echo "<p style='font-weight:bold; color: red;'>Error: " . $updateStatus->error . "</p>";
+        }
+        $updateStatus->close();
+    } 
+    else if ($conn->query($insert) === TRUE) {
         echo "<p style='font-weight:bold;'>Quote successfully submitted!</p>";
 
 
-        $commission = $total * 0.20; 
+        // $commission = $total * 0.20; 
 
 
-        $new_commission = $current_commission + $commission;
-        $update_commission_query = "UPDATE Associate SET commission = '$new_commission' WHERE USERID = '$userid'";
+        // $new_commission = $current_commission + $commission;
+        // $update_commission_query = "UPDATE Associate SET commission = '$new_commission' WHERE USERID = '$userid'";
 
-        if ($conn->query($update_commission_query) === TRUE) {
-            echo "<p style='font-weight:bold;'>Associate's commission updated successfully!</p>";
-        } else {
-            echo "<p style='font-weight:bold;'>Error updating commission: " . $conn->error . "</p>";
-        }
+        // if ($conn->query($update_commission_query) === TRUE) {
+        //     echo "<p style='font-weight:bold;'>Associate's commission updated successfully!</p>";
+        // } else {
+        //     echo "<p style='font-weight:bold;'>Error updating commission: " . $conn->error . "</p>";
+        // }
 
     } else {
         echo "<p style='font-weight:bold;'>Error: " . $conn->error . "</p>";
