@@ -46,63 +46,50 @@ if (isset($_GET['customer_id'])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     $cust_id = $conn->real_escape_string($_POST['customer_id']);
     $email = $conn->real_escape_string($_POST['email']);
     $items = $conn->real_escape_string($_POST['items']);
     $prices = $conn->real_escape_string($_POST['prices']);
     $notes = $conn->real_escape_string($_POST['notes']);
     $discount = floatval($_POST['discount']);
-    
-    $item_prices = explode(",", $_POST['prices']); 
+
+    // Calculate total and apply discount
+    $item_prices = explode(",", $_POST['prices']);
     $total = 0;
     foreach ($item_prices as $price) {
         $total += floatval(trim($price));
     }
-
     $discounted_total = $total * (1 - $discount / 100);
     $total = number_format($discounted_total, 2, '.', '');
 
-   
-    $insert = "INSERT INTO Quote (created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id, customer_name, asc_name, asc_name_last, `status`)
-               VALUES ('{$_SESSION['userid']}', '$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id, '$customer_name', '$associate_name','$associate_name_last', 'unresolved')";
+    // Generate quote_id (format: 3b-###-###)
+    $quote_id = "3b-" . str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT) . "-" . str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT);
+
+    // INSERT quote with generated quote_id
+    $insert = "INSERT INTO Quote (quote_id, created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id, customer_name, asc_name, asc_name_last, `status`)
+               VALUES ('$quote_id', '{$_SESSION['userid']}', '$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id, '$customer_name', '$associate_name','$associate_name_last', 'unresolved')";
 
     if (isset($_POST['submit_quote'])) {
         $updateStatus = $conn->prepare("UPDATE Quote SET `status` = 'finalized' WHERE quote_id = ?");
         $updateStatus->bind_param("s", $quote_id);
         if ($updateStatus->execute()) {
             echo "<p style='font-weight:bold; color: green;'>Quote successfully submitted!</p>";
-            //header("Location: Sanction.php");
             exit();
         } else {
             echo "<p style='font-weight:bold; color: red;'>Error: " . $updateStatus->error . "</p>";
         }
         $updateStatus->close();
-    } 
+    }
     else if ($conn->query($insert) === TRUE) {
-        echo "<p style='font-weight:bold;'>Quote successfully saved!</p>";
-
-
-        // $commission = $total * 0.20; 
-
-
-        // $new_commission = $current_commission + $commission;
-        // $update_commission_query = "UPDATE Associate SET commission = '$new_commission' WHERE USERID = '$userid'";
-
-        // if ($conn->query($update_commission_query) === TRUE) {
-        //     echo "<p style='font-weight:bold;'>Associate's commission updated successfully!</p>";
-        // } else {
-        //     echo "<p style='font-weight:bold;'>Error updating commission: " . $conn->error . "</p>";
-        // }
-
+        echo "<p style='font-weight:bold;'>Quote successfully saved! Quote ID: $quote_id</p>";
     } else {
         echo "<p style='font-weight:bold;'>Error: " . $conn->error . "</p>";
     }
 
+    // Preserve form values for redisplay
     $quote_items = $_POST['items'];
     $quote_item_prices = $_POST['prices'];
     $quote_discount = $_POST['discount'];
-
 
     $conn->close();
 }
