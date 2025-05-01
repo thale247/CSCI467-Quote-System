@@ -102,6 +102,34 @@ $legacy_conn->close();
 <head>
     <title>New Quote</title>
 </head>
+<script>
+    // These values are populated by PHP
+    const existingItems = <?php echo json_encode(explode(",", $quote_items)); ?>;
+    const existingPrices = <?php echo json_encode(explode(",", $quote_item_prices)); ?>;
+    const discount = <?php echo json_encode($quote_discount); ?>;
+
+    // Prepopulate the form
+    window.onload = function () {
+        const container = document.getElementById("items-container");
+
+        for (let i = 0; i < existingItems.length; i++) {
+            const row = document.createElement("div");
+            row.style.display = "flex";
+            row.style.gap = "10px";
+            row.style.marginBottom = "10px";
+            row.style.alignItems = "center";
+
+            row.innerHTML = `
+                <input type="text" placeholder="Item Name" class="item-name" required value="${existingItems[i]}" style="padding: 5px;">
+                <input type="number" step="0.01" placeholder="Price" class="item-price" required value="${existingPrices[i]}" oninput="calculateTotal()" style="padding: 5px;">
+                <button type="button" onclick="removeItem(this)" style="background-color: black; color: white; border: none; padding: 4px 10px; font-weight: bold; font-size: 16px; cursor: pointer; line-height: 1;">X</button>
+            `;
+            container.appendChild(row);
+        }
+
+        calculateTotal();  // Set total on load
+    };
+</script>
 <body style="font-family: Arial, sans-serif; padding: 20px;">
     <h2 style="margin-bottom: 10px;">CREATING NEW QUOTE FOR: <?php echo htmlspecialchars($customer_name); ?></h2>
 
