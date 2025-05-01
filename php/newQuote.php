@@ -64,8 +64,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $total = number_format($discounted_total, 2, '.', '');
 
    
-    $insert = "INSERT INTO Quote (created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id, customer_name, asc_name, asc_name_last)
-               VALUES ('{$_SESSION['userid']}', '$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id, '$customer_name', '$associate_name','$associate_name_last')";
+    $insert = "INSERT INTO Quote (created_by, customer_email, items, item_prices, secret_notes, discount_percentage, total_amount, customer_id, customer_name, asc_name, asc_name_last, `status`)
+               VALUES ('{$_SESSION['userid']}', '$email', '$items', '$prices', '$notes', '$discount', '$total', $customer_id, '$customer_name', '$associate_name','$associate_name_last', 'unresolved')";
 
     if ($conn->query($insert) === TRUE) {
         echo "<p style='font-weight:bold;'>Quote successfully submitted!</p>";
@@ -136,6 +136,8 @@ $legacy_conn->close();
         <div id="total-amount" style="font-weight: bold; font-size: 18px;">$0.00</div><br><br>
 
         <input type="submit" value="Submit Quote" style="padding: 10px 20px; font-weight: bold;">
+        <button type="button" onclick="submit_quote()" style="padding: 10px 20px; font-weight: bold;">Finalize Quote</button>
+
     </form>
 
     <script>
@@ -190,6 +192,15 @@ $legacy_conn->close();
 
             calculateTotal();
             return true;
+        }
+
+        function submit_quote() {
+            const form = document.querySelector('form');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'submit_quote';
+            form.appendChild(hiddenInput);
+            form.submit();
         }
 
         calculateTotal();

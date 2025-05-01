@@ -145,7 +145,7 @@ $legacy_conn->close();
         <div id="total-amount" style="font-weight: bold; font-size: 18px;">$0.00</div><br><br>
 
         <input type="submit" value="Submit Quote" style="padding: 10px 20px; font-weight: bold;">
-        <button type="button" onclick="submit_quote()" style="margin: 10px 0;">Finalize Quote</button>
+        <button type="button" onclick="submit_quote()" style="padding: 10px 20px; font-weight: bold;">Finalize Quote</button>
     </form>
 
     <script>
