@@ -83,6 +83,20 @@ $quote_result = $conn->query($quote_query);
             background-color: #45a049;
         }
 
+        .view-quotes-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .view-quotes-btn:hover {
+            background-color: #2980b9;
+        }
+
         button {
             background-color: #4CAF50;
             color: white;
@@ -154,6 +168,7 @@ $quote_result = $conn->query($quote_query);
     <button type="submit">Admin data</button>
     </form>
 
+    <a href="QuoteSearch.php" class="view-quotes-btn">Search Quotes</a>
 
     <h3>Process Quotes:</h3>
     <table border="0">

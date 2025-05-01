@@ -1,9 +1,6 @@
 <?php
 session_start();
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 if (!isset($_SESSION['userid'])) {
     header("Location: ../index.php");
@@ -131,7 +128,7 @@ $quote_result = $stmt->get_result();
                     echo "<td>" . htmlspecialchars($quote['secret_notes']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['discount_percentage']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
-                    echo "<td>" . htmlspecialchars($quote['commission']) . "</td>";
+                    echo "<td>" . htmlspecialchars($quote['commission'] ?? "") . "</td>";
                     echo "<td>" . htmlspecialchars($quote['created']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['status']) . "</td>";
                     echo "<td> 

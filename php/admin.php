@@ -115,19 +115,7 @@ $associate_result = $conn->query($associate_query);
             background-color: #c0392b;
         }
 
-        .view-quotes-btn {
-            background-color: #3498db;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
 
-        .view-quotes-btn:hover {
-            background-color: #2980b9;
-        }
 
         .back-btn {
             background-color: #4CAF50;
@@ -211,7 +199,6 @@ $associate_result = $conn->query($associate_query);
     </form>
 
     <a href="ProcessingOrder.php" class="back-btn">Back to Processing Orders</a>
-    <a href="QuoteSearch.php" class="view-quotes-btn">Search Quotes</a>
 
 </body>
 </html>
