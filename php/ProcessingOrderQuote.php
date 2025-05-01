@@ -42,13 +42,14 @@ if (isset($_GET['quote_id'])) {
         $quote = $quote_result->fetch_assoc();
         $customer_email = $quote['customer_email'];
         $created_by = $quote['created_by'];
-        $items = $quote['items'];
-        $item_prices = $quote['item_prices'];
-        $item_descriptions = $quote['item_details'];
+        $quote_items = $quote['items'];
+        $quote_item_prices = $quote['item_prices'];
+        $quote_item_details = $quote['item_details'];
         $secret_notes = $quote['secret_notes'];
         $total_amount = $quote['total_amount'];
         $status = $quote['status'];
         $discount = $quote['discount_percentage'];
+        $quote_discount_per = $quote['discount_percentage'];
     } else {
         die("Quote not found.");
     }
@@ -114,8 +115,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 $message = "Dear $customer_name,\n\nYour order has been successfully placed.\n\nQuote ID: $quote_id\n";
                 $item_array = explode(",", $items);
-                $desc_array = explode(",", $item_descriptions);
-                $price_array = explode(",", $item_prices);
+                $desc_array = explode(",", $quote_item_details);
+                $price_array = explode(",", $quote_item_prices);
 
                 $message .= "\nOrder Details:\n";
                 for ($i = 0; $i < count($item_array); $i++) {

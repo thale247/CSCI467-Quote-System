@@ -46,11 +46,12 @@ $quote = $quote_result->fetch_assoc();
 $quote_stmt->close();
 
 $customer_email = $quote['customer_email'];
-$items = explode(",", $quote['items']);
-$item_prices = explode(",", $quote['item_prices']);
-$item_descriptions = explode(",", $quote['item_details']);
+$quote_items = explode(",", $quote['items']);
+$quote_item_prices = explode(",", $quote['item_prices']);
+$quote_item_details = explode(",", $quote['item_details']);
 $total_amount = $quote['total_amount'];
 $discount = $quote['discount_percentage'];
+$quote_discount_per = $quote['discount_percentage'];
 $status = $quote['status'];
 $asc_id = $quote['created_by'];
 $secret_notes = $quote['secret_notes'];
@@ -84,8 +85,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $message .= "Itemized List:\n";
             for ($i = 0; $i < count($items); $i++) {
                 $name = $items[$i] ?? '';
-                $desc = $item_descriptions[$i] ?? '';
-                $price = $item_prices[$i] ?? '';
+                $desc = $quote_item_details[$i] ?? '';
+                $price = $quote_item_prices[$i] ?? '';
                 $message .= "- $name ($desc): \$$price\n";
             }
             $message .= "\nDiscount Applied: $discount%\n";
@@ -103,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     } else {
         $update = $conn->prepare("UPDATE Quote SET customer_email = ?, items = ?, item_prices = ?, item_details = ?, secret_notes = ?, discount_percentage = ?, total_amount = ?, customer_id = ? WHERE quote_id = ?");
-        $update->bind_param("ssssdsiss", $email, $items, $prices, $descriptions, $notes, $discount_percent, $formatted_total, $cust_id, $quote_id);
+        $update->bind_param("ssssdsiss", $email, $quote_items, $prices, $descriptions, $notes, $discount_percent, $formatted_total, $cust_id, $quote_id);
 
         if ($update->execute()) {
             echo "<p style='font-weight:bold;'>Quote successfully updated!</p>";

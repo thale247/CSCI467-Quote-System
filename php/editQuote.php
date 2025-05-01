@@ -31,7 +31,7 @@ if (isset($_GET['quote_id'])) {
         $quote_price = $quote['total_amount'];
         $quote_items = $quote['items'];
         $quote_item_prices = $quote['item_prices'];
-        $quote_item_descriptions = $quote['item_details'];
+        $quote_item_details = $quote['item_details'];
         $status = $quote['status'];
 
         $customer_id = $quote['customer_id'];
