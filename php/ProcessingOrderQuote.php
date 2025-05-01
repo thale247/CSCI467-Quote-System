@@ -93,8 +93,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "<p style='color: red;'>Error sending purchase order.</p>";
         } else {
             $response = json_decode($result, true);
-            if (isset($response['commission'])) {
-                $commission_str = $response['commission']; // e.g., "8%"
+            if (isset($response['Commission'])) {
+                $commission_str = $response['Commission']; // e.g., "8%"
                 $commission_pct = floatval(str_replace('%', '', $commission_str)) / 100.0;
                 $commission_amount = $discounted_total * $commission_pct;
 

@@ -227,6 +227,7 @@ $legacy_conn->close();
         }
 
         function submit_quote() {
+            prepare()
             const form = document.querySelector('form');
             const hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
