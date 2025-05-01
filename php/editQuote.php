@@ -95,6 +95,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+    $quote_items = $_POST['items'];
+    $quote_item_prices = $_POST['prices'];
+    $quote_discount = $_POST['discount'];
+
     $conn->close();
 }
 
@@ -106,6 +110,35 @@ $legacy_conn->close();
 <head>
     <title>Editing Quote</title>
 </head>
+<script>
+    // These values are populated by PHP
+    const existingItems = <?php echo json_encode(explode(",", $quote_items)); ?>;
+    const existingPrices = <?php echo json_encode(explode(",", $quote_item_prices)); ?>;
+    const discount = <?php echo json_encode($quote_discount); ?>;
+
+    // Prepopulate the form
+    window.onload = function () {
+        const container = document.getElementById("items-container");
+
+        for (let i = 0; i < existingItems.length; i++) {
+            const row = document.createElement("div");
+            row.style.display = "flex";
+            row.style.gap = "10px";
+            row.style.marginBottom = "10px";
+            row.style.alignItems = "center";
+
+            row.innerHTML = `
+                <input type="text" placeholder="Item Name" class="item-name" required value="${existingItems[i]}" style="padding: 5px;">
+                <input type="number" step="0.01" placeholder="Price" class="item-price" required value="${existingPrices[i]}" oninput="calculateTotal()" style="padding: 5px;">
+                <button type="button" onclick="removeItem(this)" style="background-color: black; color: white; border: none; padding: 4px 10px; font-weight: bold; font-size: 16px; cursor: pointer; line-height: 1;">X</button>
+            `;
+            container.appendChild(row);
+        }
+
+        calculateTotal();  // Set total on load
+    };
+</script>
+
 <body style="font-family: Arial, sans-serif; padding: 20px;">
     <h2 style="margin-bottom: 10px;">EDITING QUOTE FOR: <?php echo htmlspecialchars($customer_name); ?></h2>
 
@@ -144,8 +177,8 @@ $legacy_conn->close();
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
         <div id="total-amount" style="font-weight: bold; font-size: 18px;">$0.00</div><br><br>
 
-        <input type="submit" value="Submit Quote" style="padding: 10px 20px; font-weight: bold;">
-        <button type="button" onclick="submit_quote()" style="padding: 10px 20px; font-weight: bold;">Finalize Quote</button>
+        <input type="submit" value="Save Quote" style="padding: 10px 20px; font-weight: bold;">
+        <button type="button" onclick="submit_quote()" style="padding: 10px 20px; font-weight: bold;">Submit Quote</button>
     </form>
 
     <script>

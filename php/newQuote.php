@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $updateStatus->close();
     } 
     else if ($conn->query($insert) === TRUE) {
-        echo "<p style='font-weight:bold;'>Quote successfully submitted!</p>";
+        echo "<p style='font-weight:bold;'>Quote successfully saved!</p>";
 
 
         // $commission = $total * 0.20; 
@@ -98,6 +98,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         echo "<p style='font-weight:bold;'>Error: " . $conn->error . "</p>";
     }
+
+    $quote_items = $_POST['items'];
+    $quote_item_prices = $_POST['prices'];
+    $quote_discount = $_POST['discount'];
+
 
     $conn->close();
 }
@@ -147,8 +152,8 @@ $legacy_conn->close();
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
         <div id="total-amount" style="font-weight: bold; font-size: 18px;">$0.00</div><br><br>
 
-        <input type="submit" value="Submit Quote" style="padding: 10px 20px; font-weight: bold;">
-        <button type="button" onclick="submit_quote()" style="padding: 10px 20px; font-weight: bold;">Finalize Quote</button>
+        <input type="submit" value="Save Quote" style="padding: 10px 20px; font-weight: bold;">
+        <button type="button" onclick="submit_quote()" style="padding: 10px 20px; font-weight: bold;">Submit Quote</button>
 
     </form>
 
