@@ -141,6 +141,9 @@ $legacy_conn->close();
             container.appendChild(row);
         }
 
+        document.getElementById("discount").value = discount.toFixed(2);
+        document.getElementById("discount_percent").value = discount_per.toFixed(2);
+
         calculateTotal(); 
     };
 </script>

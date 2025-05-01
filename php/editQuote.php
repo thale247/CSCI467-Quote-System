@@ -98,11 +98,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+    $customer_email = $_POST['email'];
     $quote_items = $_POST['items'];
     $quote_item_prices = $_POST['prices'];
-    $quote_item_descriptions = $_POST['descriptions'];
+    $quote_item_details = $_POST['descriptions'];
     $quote_discount = $_POST['discount'];
-    $quote_email = $_POST['email'];
+    $quote_discount_per = $_POST['discount_percent'];
 
     $conn->close();
 }
@@ -116,10 +117,12 @@ $legacy_conn->close();
     <title>Editing Quote</title>
 </head>
 <script>
-    const existingItems = <?php echo json_encode(explode(",", $quote_items)); ?>;
-    const existingPrices = <?php echo json_encode(explode(",", $quote_item_prices)); ?>;
-    const existingDescriptions = <?php echo json_encode(explode(",", $quote_item_descriptions)); ?>;
-    const discount = <?php echo json_encode($quote_discount); ?>;
+    const existingEmail = <?php echo json_encode($email ?? ""); ?>;
+    const existingItems = <?php echo json_encode(explode(",", $quote_items ?? "")); ?>;
+    const existingPrices = <?php echo json_encode(explode(",", $quote_item_prices ?? "")); ?>;
+    const existingDescriptions = <?php echo json_encode(explode(",", $quote_item_details ?? "")); ?>;
+    const discount_per = <?php echo json_encode($quote_discount_per ?? "0"); ?>;
+    const discount = <?php echo json_encode($quote_discount ?? "0"); ?>;
 
     window.onload = function () {
         const container = document.getElementById("items-container");
@@ -141,6 +144,9 @@ $legacy_conn->close();
             `;
             container.appendChild(row);
         }
+
+        document.getElementById("discount").value = discount.toFixed(2);
+        document.getElementById("discount_percent").value = discount_per.toFixed(2);
 
         calculateTotal();
     };
