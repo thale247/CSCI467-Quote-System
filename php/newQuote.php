@@ -10,7 +10,7 @@ if (!isset($_SESSION['userid'])) {
 
 
 $userid = $_SESSION['userid'];
-$assoc_query = "SELECT FIRST,LAST, commission FROM Associate WHERE USERID = '$userid'";
+$assoc_query = "SELECT `FIRST`, `LAST`, commission FROM Associate WHERE USERID = '$userid'";
 $assoc_result = $conn->query($assoc_query);
 
 if ($assoc_result && $assoc_result->num_rows > 0) {
