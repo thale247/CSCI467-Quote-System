@@ -98,9 +98,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $commission_pct = floatval(str_replace('%', '', $commission_str)) / 100.0;
                 $commission_amount = $discounted_total * $commission_pct;
 
-                echo $commission_pct . ":" . $commission_amount . ":" . $user_id;
+                echo $commission_pct . ":" . $commission_amount . ":" . $userid;
 
-                $update_commission = $conn->prepare("UPDATE Associate SET commission = commission + ? WHERE userid = ?");
+                $update_commission = $conn->prepare("UPDATE Associate SET commission = commission + ? WHERE USERID = ?");
                 $update_commission->bind_param("ds", $commission_amount, $userid);
                 $update_commission->execute();
                 $update_commission->close();
