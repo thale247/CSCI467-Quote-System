@@ -71,8 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (isset($_POST['submit_quote'])) {
         $updateStatus = $conn->prepare("UPDATE Quote SET `status` = 'finalized' WHERE quote_id = ?");
-        $updateStatus->bind_param("s", $quote_id);
-        if ($updateStatus->execute()) {
+        if ($updateStatus->execute([$quote_id])) {
             echo "<p style='font-weight:bold; color: green;'>Quote successfully submitted!</p>";
             exit();
         } else {
