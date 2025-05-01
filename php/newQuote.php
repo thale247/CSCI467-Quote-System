@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     foreach ($item_prices as $price) {
         $total += floatval(trim($price));
     }
-    $discounted_total = $total * (1 - $discount / 100);
+    $discounted_total = $total - $discount;
     $total = number_format($discounted_total, 2, '.', '');
 
     // Generate quote_id (format: 3b-###-###)
@@ -89,6 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Preserve form values for redisplay
     $quote_items = $_POST['items'];
     $quote_item_prices = $_POST['prices'];
+    $quote_discount_per = $_POST['discount_percent'];
     $quote_discount = $_POST['discount'];
 
     $conn->close();
@@ -104,8 +105,10 @@ $legacy_conn->close();
 </head>
 <script>
     // These values are populated by PHP
+    const existingEmail = <?php echo json_encode($email); ?>;
     const existingItems = <?php echo json_encode(explode(",", $quote_items)); ?>;
     const existingPrices = <?php echo json_encode(explode(",", $quote_item_prices)); ?>;
+    const discount_per = <?php echo json_encode($quote_discount_per); ?>;
     const discount = <?php echo json_encode($quote_discount); ?>;
 
     // Prepopulate the form
@@ -162,7 +165,10 @@ $legacy_conn->close();
         <textarea name="notes" id="notes" rows="3" style="width: 300px; padding: 5px;"></textarea><br><br>
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount (%):</div>
+        <input type="number" name="discount_percent" id="discount_percent" step="0.01" value="0" oninput="calculateTotalPercent()" style="padding: 5px;"><br><br>
+        <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Discount ($):</div>
         <input type="number" name="discount" id="discount" step="0.01" value="0" oninput="calculateTotal()" style="padding: 5px;"><br><br>
+
 
         <div style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 5px;">Total Amount ($):</div>
         <div id="total-amount" style="font-weight: bold; font-size: 18px;">$0.00</div><br><br>
@@ -202,8 +208,27 @@ $legacy_conn->close();
             });
 
             const discount = parseFloat(document.getElementById("discount").value) || 0;
-            const discountedTotal = total * (1 - discount / 100);
+            const discountedTotal = total - discount;
             document.getElementById("total-amount").textContent = `$${total.toFixed(2)}`;
+            if(total != 0){
+                var per = discount / total;
+                document.getElementById("discount_percent").textContent = per.toFixed(2);
+            }
+        }
+
+        function calculateTotalPercent() {
+            const priceInputs = document.querySelectorAll(".item-price");
+            let total = 0;
+            priceInputs.forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            if (total != 0){
+                const discount = parseFloat(document.getElementById("discount_percent").value) || 0;
+                const discountedTotal = total * (1 - discount / 100);
+                document.getElementById("total-amount").textContent = `$${total.toFixed(2)}`;
+                var dis = (discount / 100) * total;
+                document.getElementById("discount").textContent = dis.toFixed(2);
+            }
         }
 
         function prepare() {
