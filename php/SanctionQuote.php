@@ -63,6 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $discount = floatval($_POST['discount']);
 
     $item_prices_array = explode(",", $_POST['prices']);
+    $items = explode(",", $items);
     $total = 0;
     foreach ($item_prices_array as $price) {
         $total += floatval(trim($price));
