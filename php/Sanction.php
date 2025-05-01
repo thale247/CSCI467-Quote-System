@@ -166,7 +166,7 @@ $quote_result = $conn->query($quote_query);
     <button type="submit">Admin data</button>
     </form>
 
-    <button href="QuoteSearch.php" class="view-quotes-btn">Search Quotes</button>
+    <a href="quote_search.php" class="view-quotes-btn">Search Quotes</a>
 
 
     <h3>Sanction Quotes:</h3>
