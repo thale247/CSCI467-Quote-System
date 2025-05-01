@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $items = $conn->real_escape_string($_POST['items']);
         $prices = $conn->real_escape_string($_POST['prices']);
         $descriptions = $conn->real_escape_string($_POST['descriptions']);
-        $discount = floatval($_POST['discount']);
+        $discount = floatval($_POST['discount_percent']);
         
 
         $item_prices_array = explode(",", $_POST['prices']);
@@ -78,8 +78,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         foreach ($item_prices_array as $price) {
             $total += floatval(trim($price));
         }
-
-        echo $total;
 
         $discounted_total = $total * (1 - $discount / 100);
 
