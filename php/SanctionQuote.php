@@ -73,25 +73,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (isset($_POST['sanction'])) {
         // Send to legacy system
-        $url = 'http://blitz.cs.niu.edu/PurchaseOrder/';
-        $data = array(
-            'order' => $quote_id,
-            'associate' => $_POST['asc_id'],
-            'custid' => $cust_id,
-            'amount' => $discounted_total
-        );
+        // $url = 'http://blitz.cs.niu.edu/PurchaseOrder/';
+        // $data = array(
+        //     'order' => $quote_id,
+        //     'associate' => $_POST['asc_id'],
+        //     'custid' => $cust_id,
+        //     'amount' => $discounted_total
+        // );
 
-        $options = array(
-            'http' => array(
-                'header'  => array('Content-type: application/json', 'Accept: application/json'),
-                'method'  => 'POST',
-                'content' => json_encode($data)
-            )
-        );
+        // $options = array(
+        //     'http' => array(
+        //         'header'  => array('Content-type: application/json', 'Accept: application/json'),
+        //         'method'  => 'POST',
+        //         'content' => json_encode($data)
+        //     )
+        // );
 
-        $context = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
-        echo($result);
+        // $context = stream_context_create($options);
+        // $result = file_get_contents($url, false, $context);
+        // echo($result);
 
         // Update quote status
         $update_stmt = $conn->prepare("UPDATE Quote SET status = 'sanctioned' WHERE quote_id = ?");
