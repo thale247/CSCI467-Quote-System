@@ -132,7 +132,11 @@ $quote_result = $stmt->get_result();
                     echo "<td>" . htmlspecialchars($quote['total_amount']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['created']) . "</td>";
                     echo "<td>" . htmlspecialchars($quote['status']) . "</td>";
-                    echo "<td>" . htmlspecialchars($quote['process_date'] ?? '') . "</td>";
+                    echo "<td> 
+                    <form method='POST' action=''>
+                    <input type='hidden' name='delete_quote_id' value='" . htmlspecialchars($quote['quote_id']) . "'>
+                    </form>
+                    </td>";
                     echo "</tr>";
                 }
             } else {
